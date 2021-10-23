@@ -2,7 +2,7 @@ from unittest import TestCase
 
 import pandas as pd
 
-from preparation.data_transform import prepare_unnamed
+from preparation.data_transform import transform_unnamed
 
 
 class Test(TestCase):
@@ -26,6 +26,6 @@ class Test(TestCase):
 
         heading_prefix = "Proficient in "
         e_new_first_column_name = heading_prefix + self.results_2011_df.iloc[first_valid_row_index, base_column_index]
-        new_result_2011_df = prepare_unnamed(self.results_2011_df, self.base_column_name, self.following_column_range)
+        new_result_2011_df = transform_unnamed(self.results_2011_df, self.base_column_name, self.following_column_range)
         new_first_column_name = new_result_2011_df.columns[base_column_index]
         self.assertEqual(new_first_column_name, e_new_first_column_name)
