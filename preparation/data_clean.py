@@ -1,3 +1,6 @@
+import pandas as pd
+
+
 def clean_data(df, target_feature):
     """
     This function cleans df using the following steps to produce X and y:
@@ -7,6 +10,7 @@ def clean_data(df, target_feature):
     4. For each numeric variable, fill the column with the mean value.
     6. Create dummy columns for all the categorical variables, drop the original columns
     :param df dataframe to be cleaned
+    :param target_feature: target feature to be cleaned
     :returns X - A matrix holding all of the variables you want to consider when predicting the response
              y - the corresponding response vector
     """
@@ -15,7 +19,8 @@ def clean_data(df, target_feature):
     y = df[target_feature]
 
     # Drop respondent and expected salary columns
-    df = df.drop(['Respondent', , target_feature], axis=1)
+    # TODO fix
+    # df = df.drop(['Respondent', , target_feature], axis=1)
 
     # Fill numeric columns with the mean
     num_vars = df.select_dtypes(include=['float', 'int']).columns
