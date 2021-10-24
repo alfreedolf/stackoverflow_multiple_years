@@ -1,3 +1,4 @@
+from typing import Optional, Hashable
 from unittest import TestCase
 
 import pandas as pd
@@ -20,7 +21,7 @@ class Test(TestCase):
 
     def test_prepare_unnamed_language_proficiencies(self):
         base_column_index = self.results_2011_df.columns.get_loc(self.base_column_name)
-        first_valid_row_index = self.results_2011_df[self.base_column_name].first_valid_index()
+        first_valid_row_index: Optional[Hashable] = self.results_2011_df[self.base_column_name].first_valid_index()
 
         heading_prefix = "Proficient in"
         first_heading_suffix = self.results_2011_df.iloc[first_valid_row_index, base_column_index]
