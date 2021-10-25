@@ -115,11 +115,28 @@ def _categorical_columns_range_rename(df: pandas.DataFrame, target_columns: pand
         columns_rename_map[col_name] = " ".join((column_prefix_name, column_suffix_name))
 
         if binary_output:
-            # transforming column to binary values
-            df[col_name] = df[col_name].apply(lambda x: 1 if x == column_suffix_name else 0)
+            _binarize_column(df, col_name, column_suffix_name)
     # renaming columns using the produced map
     df.rename(columns=columns_rename_map, inplace=True)
 
+
+def _binarize_column(df: pandas.DataFrame, col_name: str, true_val: str) -> pandas.Series:
+    """
+    Transforms a single column to binary values
+    """
+    df[col_name] = df[col_name].apply(lambda x: 1 if x == true_val else 0)
+
+
+def binarize_columns(df: pandas.DataFrame, col_range: range, true_values: list) -> pandas.DataFrame:
+    """
+    Transforms a set of columns (a dataframe) to binary values
+    :param df:
+    :param col_range:
+    :param true_values:
+    :return:
+    """
+    for col, tv in zip(df[col_range].columns, true_values):
+        _binarize_column(df, col, tv)
 # TODO: check it and think about deleting it
 # def clean_data(df, target_feature):
 #     """
