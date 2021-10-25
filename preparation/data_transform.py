@@ -2,8 +2,8 @@ import pandas
 import pandas as pd
 
 
-def transform_unnamed_cols_base_range_size(df: pd.DataFrame, base_column_name: str, following_columns_range_size: int,
-                                           new_column_name_prefix: str = None, inplace=False) -> object:
+def transform_unnamed_cols_base(df: pd.DataFrame, base_column_name: str, following_columns_range_size: int,
+                                new_column_name_prefix: str = None, inplace=False) -> object:
     """
     This function transforms a range of columns based on the fact that
     the following schema will be found in dataframe:
