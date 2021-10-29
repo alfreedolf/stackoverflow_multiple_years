@@ -6,7 +6,7 @@ import pandas as pd
 from preparation.data_transform import transform_unnamed_cols_base
 
 
-class TestCase1(unittest.TestCase):
+class TestUnnamedColumnsTransformation(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:

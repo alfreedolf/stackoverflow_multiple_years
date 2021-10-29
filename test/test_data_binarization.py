@@ -1,20 +1,30 @@
 import unittest
 
+import numpy as np
 import pandas as pd
-from numpy import NaN
 
 from preparation.data_transform import binarize_column, binarize_columns_range
 
 
-def _is_binary(df):
+def _contains_all_true_values(df):
     nd_df = df.to_numpy()  # s.values (pandas<0.24)
     return (nd_df[0] == 1).all()
 
 
-class TetCase2(unittest.TestCase):
+def _contains_all_false_values(df):
+    nd_df = df.to_numpy()  # s.values (pandas<0.24)
+    return (nd_df[0] == 0).all()
+
+
+def _contains_binary_values_only(df):
+    nd_df = df.to_numpy()  # s.values (pandas<0.24)
+    return not (np.any(nd_df[0] > 1) and np.any(nd_df[0] < 0))
+
+
+class TestBinarization(unittest.TestCase):
 
     def setUp(self) -> None:
-        dummy_lp_data = {'python_proficient': ['python', NaN, 'python'], 'java_proficient': [NaN, 'java', NaN]}
+        dummy_lp_data = {'python_proficient': ['python', np.NaN, 'python'], 'java_proficient': [np.NaN, 'java', np.NaN]}
         self.df_binarizable = pd.DataFrame(data=dummy_lp_data)
 
         # data load
@@ -31,22 +41,26 @@ class TetCase2(unittest.TestCase):
         # computing valid values
         self.results_2015_FVI = []
         self.results_2015_true_values = []
-        for i_col, col in enumerate(self.results_2015_df.columns):
+        for col in self.results_2015_df.iloc[:, self.results_2015_CROI].columns:
             valid_row = self.results_2015_df[col].first_valid_index()
             # rows of interest
             self.results_2015_FVI.append(valid_row)
-            self.results_2015_true_values.append(self.results_2015_df.iloc[valid_row, i_col])
+            self.results_2015_true_values.append(
+                self.results_2015_df.iloc[valid_row, self.results_2015_df.columns.get_loc(col)])
 
     def test_binarize_columns_range(self):
         # computing expected output
         binarize_columns_range(self.results_2015_df, self.results_2015_CROI, self.results_2015_true_values)
         df_binarized = self.results_2015_df.iloc[self.results_2015_FVI, self.results_2015_CROI]
+        df_tmp = self.results_2015_df.iloc[:, self.results_2015_CROI].head()
+        self.assertTrue(_contains_binary_values_only(df_binarized),
+                        msg="Binarizable values = {}, \n True values = {}, \n binarized column = {}".format(
+                            self.results_2015_df.iloc[:, self.results_2015_CROI], self.results_2015_true_values,
+                            df_binarized))
 
-        self.assertTrue(_is_binary(df_binarized))
-
-    def test__binarize_column(self):
+    def test_binarize_column(self):
         binarize_column(self.df_binarizable, col_name='python_proficient', true_val='python')
-        self.assertTrue(_is_binary(self.df_binarizable))
+        self.assertTrue(_contains_binary_values_only(self.df_binarizable))
 
 
 if __name__ == '__main__':
