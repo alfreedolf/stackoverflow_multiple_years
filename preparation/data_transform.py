@@ -1,10 +1,11 @@
-from typing import Dict
+from typing import Dict, Optional
 
 import pandas
 import pandas as pd
+from pandas import DataFrame
 
 
-def transform_unnamed_cols_base(df: pd.DataFrame, base_column_name: str, following_columns_range_size: int,
+def transform_unnamed_cols_base(df: pd.DataFrame, base_column_name: str, columns_look_ahead: int,
                                 new_column_name_prefix: str = None, inplace=False) -> object:
     """
     This function transforms a range of columns based on the fact that
@@ -26,7 +27,7 @@ def transform_unnamed_cols_base(df: pd.DataFrame, base_column_name: str, followi
 
     :param df: input dataframe to be processed
     :param base_column_name: base column name to be used as basis to build option columns
-    :param following_columns_range_size: how many columns, starting from column following the base_column_name,
+    :param columns_look_ahead: how many columns, starting from column following the base_column_name,
     has to be transformed
     :param new_column_name_prefix:  new name to be added as base_name to rename map
     :param inplace: If False, return a copy. Otherwise, do operation inplace and return None.
@@ -35,7 +36,7 @@ def transform_unnamed_cols_base(df: pd.DataFrame, base_column_name: str, followi
 
     # extracting  columns of interest
     df_target_columns = df.iloc[:, df.columns.get_loc(base_column_name): (df.columns.get_loc(base_column_name) +
-                                                                          following_columns_range_size)]
+                                                                          columns_look_ahead)]
 
     return _even_out_categorical_as_binaries(df, df_target_columns,
                                              new_column_name_prefix=new_column_name_prefix, inplace=inplace)
@@ -121,14 +122,26 @@ def _categorical_columns_range_rename(df: pandas.DataFrame, target_columns: pand
     df.rename(columns=columns_rename_map, inplace=True)
 
 
-def binarize_column(df: pandas.DataFrame, col_name: str, true_val: str):
+def binarize_column(df: pandas.DataFrame, col_name: str, true_val: str, inplace: bool = True) -> Optional[DataFrame]:
     """
-    Transforms a single column to binary values
+    Transforms a single column to binary values, converting specific values to '1' and all the other values to '0'
+    :param df: input dataframe
+    :param col_name: target column
+    :param true_val: values to be converted to '1'
+    :param inplace: If False, return a copy. Otherwise, do operation inplace and return None.
+    :return optionally returns input df modified, if inplace is False
     """
-    df[col_name] = df[col_name].apply(lambda x: 1 if x == true_val else 0)
+    if not inplace:
+        df_out = df.copy(deep=True)
+        df_out[col_name] = df_out[col_name].apply(lambda x: 1 if x == true_val else 0)
+        return df_out
+    else:
+        df[col_name] = df[col_name].apply(lambda x: 1 if x == true_val else 0)
+        return None
 
 
-def binarize_columns_range(df: pandas.DataFrame, col_range: range, true_values: list) -> pandas.DataFrame:
+def binarize_columns_range(df: pandas.DataFrame, col_range: range, true_values: list,
+                           inplace: bool = True) -> Optional[DataFrame]:
     """
     Transforms a set of columns (a dataframe) to binary values
     :param df: input dataframe
@@ -136,10 +149,27 @@ def binarize_columns_range(df: pandas.DataFrame, col_range: range, true_values: 
     :param true_values: the function will look in the range of columns
     for each of the each of the values in this list respectively,
     writing a '1' in each cell that contains the value and a '0' in each cell that doesn't.
+    :param inplace: If False, return a copy. Otherwise, do operation inplace and return None.
     :return: input dataframe updated according to binarization
     """
-    for col, tv in zip(df.iloc[:, col_range].columns, true_values):
-        binarize_column(df, col, tv)
+    if not inplace:
+        df_out = df.copy(deep=True)
+        for col, tv in zip(df_out.iloc[:, col_range].columns, true_values):
+            binarize_column(df_out, col, tv, inplace=True)
+        return df_out
+    else:
+        for col, tv in zip(df.iloc[:, col_range].columns, true_values):
+            binarize_column(df, col, tv, inplace=inplace)
+        return None
+
+
+def first_valid_value_index(column_name: str, column_data: pd.Series):
+    curr_valid_index = -1
+    for i, val in column_data.iteritems():
+        if isinstance(val, str):
+            if val in column_name and curr_valid_index < 0:
+                curr_valid_index = i + 1
+    return curr_valid_index
 
 # TODO: check it and think about deleting it
 # def clean_data(df, target_feature):

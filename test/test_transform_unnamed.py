@@ -34,7 +34,7 @@ class TestUnnamedColumnsTransformation(unittest.TestCase):
         new_result_2011_df = \
             transform_unnamed_cols_base(self.results_2011_df, self.results_2011_base_column_name,
                                         new_column_name_prefix=heading_prefix,
-                                        following_columns_range_size=self.results_2011_following_column_range_size)
+                                        columns_look_ahead=self.results_2011_following_column_range_size)
         new_first_column_name = new_result_2011_df.columns[base_column_index]
         # checking output value
         self.assertEqual(new_first_column_name, e_new_first_column_name)
