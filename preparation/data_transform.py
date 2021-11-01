@@ -1,3 +1,4 @@
+import re
 from typing import Dict, Optional
 
 import pandas
@@ -172,31 +173,54 @@ def first_valid_value_index(column_name: str, column_data: pd.Series):
     return curr_valid_index
 
 
-def split_lang_proficiency_column(df: pd.DataFrame,
-                                  column_to_split: str, inplace: bool = True) -> Optional[pd.DataFrame]:
+def feature_split(df: pd.DataFrame,
+                  column_to_split: str, sep: str = ";", inplace: bool = True) -> Optional[pd.DataFrame]:
     """
     This function splits data from a single column into a set of columns
+    :rtype: object
     :param df: input dataframe
     :param column_to_split: name of the column to be split
+    :param sep: separator to be used in feature splitting
     :param inplace: If False, return a copy. Otherwise, do operation inplace and return None.
     :return: optionally returns a new dataframe
     """
-    lang_prof = df.loc[:, column_to_split]
-    languages = set()
-    if isinstance(lang_prof, str):
-        for lang in lang_prof.split(";"):
-            languages.add(lang)
+    feature_rows: pd.Series = df.loc[:, column_to_split]
+    features = set()
     if not inplace:
         df_out = df.copy(deep=True)
-        for lang in languages:
-            column_name = column_to_split + ": " + lang
-            df_out[column_name] = df_out[column_to_split].apply(lambda x: 1 if column_name in x else 0)
+
+    # iterating over features rows to populate features set
+    for fr in feature_rows:
+        if isinstance(fr, str):
+            for feat in fr.split(sep=sep):
+                features.add(feat)
+
+    # transforming features set and sorting alphabetically
+    features = list(features)
+    features.sort()
+
+    # iterating over features to create dedicated column
+    for feat in features:
+        column_name = column_to_split + ": " + feat
+        if not inplace:
+            df_out[column_name] = \
+                df_out[column_to_split].apply(lambda x: 1 if isinstance(x, str) and string_found(feat, x) else 0)
+        else:
+            df[column_name] = df[column_to_split].apply(
+                lambda x: 1 if isinstance(x, str) and string_found(feat, x) else 0)
+
+    if not inplace:
+        df_out.drop(labels=column_to_split, axis=1, inplace=True)
         return df_out
     else:
-        for lang in languages:
-            column_name = column_to_split + ": " + lang
-            df[column_name] = df[column_to_split].apply(lambda x: 1 if column_name in x else 0)
+        df.drop(labels=column_to_split, axis=1, inplace=True)
         return None
+
+
+def string_found(string1, string2):
+    if re.search(r"\b" + re.escape(string1) + r"\b", string2):
+        return True
+    return False
 
 # TODO: check it and think about deleting it
 # def clean_data(df, target_feature):
