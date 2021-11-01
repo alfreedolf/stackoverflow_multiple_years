@@ -171,6 +171,33 @@ def first_valid_value_index(column_name: str, column_data: pd.Series):
                 curr_valid_index = i + 1
     return curr_valid_index
 
+
+def split_lang_proficiency_column(df: pd.DataFrame,
+                                  column_to_split: str, inplace: bool = True) -> Optional[pd.DataFrame]:
+    """
+    This function splits data from a single column into a set of columns
+    :param df: input dataframe
+    :param column_to_split: name of the column to be split
+    :param inplace: If False, return a copy. Otherwise, do operation inplace and return None.
+    :return: optionally returns a new dataframe
+    """
+    lang_prof = df.loc[:, column_to_split]
+    languages = set()
+    if isinstance(lang_prof, str):
+        for lang in lang_prof.split(";"):
+            languages.add(lang)
+    if not inplace:
+        df_out = df.copy(deep=True)
+        for lang in languages:
+            column_name = column_to_split + ": " + lang
+            df_out[column_name] = df_out[column_to_split].apply(lambda x: 1 if column_name in x else 0)
+        return df_out
+    else:
+        for lang in languages:
+            column_name = column_to_split + ": " + lang
+            df[column_name] = df[column_to_split].apply(lambda x: 1 if column_name in x else 0)
+        return None
+
 # TODO: check it and think about deleting it
 # def clean_data(df, target_feature):
 #     """
