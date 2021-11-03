@@ -184,36 +184,33 @@ def feature_split(df: pd.DataFrame,
     :param inplace: If False, return a copy. Otherwise, do operation inplace and return None.
     :return: optionally returns a new dataframe
     """
-    feature_rows: pd.Series = df.loc[:, column_to_split]
+
+    # retrieving feature values from desired column
+    joint_features_series: pd.Series = df.loc[:, column_to_split]
+    # initializing empty set
     features = set()
+
     if not inplace:
+        # copying input dataframe
         df_out = df.copy(deep=True)
 
     # iterating over features rows to populate features set
-    for fr in feature_rows:
-        if isinstance(fr, str):
-            for feat in fr.split(sep=sep):
-                features.add(feat)
-
-    # transforming features set and sorting alphabetically
-    features = list(features)
-    features.sort()
-
-    # iterating over features to create dedicated column
-    for feat in features:
-        column_name = column_to_split + ": " + feat
-        if not inplace:
-            df_out[column_name] = \
-                df_out[column_to_split].apply(lambda x: 1 if isinstance(x, str) and string_found(feat, x) else 0)
-        else:
-            df[column_name] = df[column_to_split].apply(
-                lambda x: 1 if isinstance(x, str) and string_found(feat, x) else 0)
+    for index, joint_features in joint_features_series.iteritems():
+        if isinstance(joint_features, str):
+            for feat in joint_features.split(sep=sep):
+                column_name = column_to_split + ": " + feat
+                if not inplace:
+                    df_out.loc[index, column_name] = 1
+                else:
+                    df.loc[index, column_name] = 1
 
     if not inplace:
         df_out.drop(labels=column_to_split, axis=1, inplace=True)
+        df_out.fillna(value=0, inplace=True)
         return df_out
     else:
         df.drop(labels=column_to_split, axis=1, inplace=True)
+        df.fillna(value=0, inplace=True)
         return None
 
 
