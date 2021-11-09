@@ -1,8 +1,9 @@
 """
 This file contains functions needed to load data from sources
 """
-import pandas as pd
 import os
+
+import pandas as pd
 
 
 def load_from_csv(file_path: str, encoding: str):

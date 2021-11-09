@@ -9,8 +9,7 @@ from pandas import DataFrame
 def transform_unnamed_cols_base(df: pd.DataFrame, base_column_name: str, columns_look_ahead: int,
                                 new_column_name_prefix: str = None, inplace=False) -> object:
     """
-    This function transforms a range of columns based on the fact that
-    the following schema will be found in dataframe:
+    This function transforms a range of columns based assuming the presence of following schema in dataframe:
 
     |base_column_name|Unnamed_n|Unnamed_n+1|Unnamed_n+2|---
     |option_1        |NaN      |NaN        |NaN        |---
@@ -46,8 +45,7 @@ def transform_unnamed_cols_base(df: pd.DataFrame, base_column_name: str, columns
 def transform_unnamed_cols_range(df: pd.DataFrame, columns_range: range,
                                  new_column_name_prefix: str, inplace=False) -> object:
     """
-    This function transforms a range of columns based on the fact that
-    the following schema will be found in dataframe:
+    This function transforms a range of columns based assuming the presence of following schema in dataframe:
 
     |base_column_name|Unnamed_n|Unnamed_n+1|Unnamed_n+2|---
     |option_1        |NaN      |NaN        |NaN        |---
@@ -193,24 +191,22 @@ def feature_split(df: pd.DataFrame,
     if not inplace:
         # copying input dataframe
         df_out = df.copy(deep=True)
+    else:
+        df_out = df
 
     # iterating over features rows to populate features set
     for index, joint_features in joint_features_series.iteritems():
         if isinstance(joint_features, str):
-            for feat in joint_features.split(sep=sep):
+            # joint_features_list =
+            for feat in [feat.strip() for feat in joint_features.split(sep=sep)]:
                 column_name = column_to_split + ": " + feat
-                if not inplace:
-                    df_out.loc[index, column_name] = 1
-                else:
-                    df.loc[index, column_name] = 1
+                df_out.loc[index, column_name] = 1
 
+    df_out.drop(labels=column_to_split, axis=1, inplace=True)
+    df_out.fillna(value=0, inplace=True)
     if not inplace:
-        df_out.drop(labels=column_to_split, axis=1, inplace=True)
-        df_out.fillna(value=0, inplace=True)
         return df_out
     else:
-        df.drop(labels=column_to_split, axis=1, inplace=True)
-        df.fillna(value=0, inplace=True)
         return None
 
 
