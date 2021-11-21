@@ -23,16 +23,16 @@ For this project, I was interested in using Stack Overflow data from multiple ye
 
 ## File Descriptions <a name="files"></a>
 
-There are 3 notebooks available here to showcase work related to the above questions.<br/>
-Each of the notebooks is exploratory in searching through the data pertaining to the questions showcased by the notebook
-title.<br/>
+There will be 4 notebooks available here to showcase work related to the above questions.<br/>
+Each of the notebooks will be exploratory in searching through the data pertaining to the questions showcased by the
+notebook title.<br/>
 Markdown cells were used to assist in walking through the thought process for individual steps.
 
 There is an additional `.py` file that runs the necessary code to obtain the final model used to predict salary.
 
 ## Results<a name="results"></a>
 
-The main findings of the code can be found at the post available [here](https://medium.com/TBD).
+The main findings of the code will be found at the post available [here](https://medium.com/TBD).
 
 ## Licensing, Authors, Acknowledgements<a name="licensing"></a>
 
