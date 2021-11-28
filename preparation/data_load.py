@@ -40,6 +40,24 @@ def load_surveys_data_from_csv(years=None, data_path="data", encoding="ISO-8859-
     return surveys_years_df
 
 
+def get_dataset_max_shapes(df_dict):
+    """
+    This function will extract max shapes values from dataset
+    :param df_dict: input dictionary
+    :return: max number of columns and rows
+    """
+    max_rows = 0
+    max_cols = 0
+    for _, df in df_dict.items():
+        # counting rows
+        if max_rows < df.shape[0]:
+            max_rows = df.shape[0]
+        # counting columns
+        if max_cols < df.shape[1]:
+            max_cols = df.shape[1]
+    return max_rows, max_cols
+
+
 def get_intersection(features_list1: list, features_list2: list) -> list:
     """
     Get intersection between two list of features as strings list

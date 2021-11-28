@@ -220,3 +220,24 @@ def string_found(string1, string2):
     if re.search(r"\b" + re.escape(string1) + r"\b", string2):
         return True
     return False
+
+
+def df_2015_survey_preprocessing(df_surveys_15_in, lang_proficiencies_columns_range_of_interest_2015):
+    """
+    This function preprocesses data from 2015 survey
+    :param df_surveys_15_in:
+    :param lang_proficiencies_columns_range_of_interest_2015:
+    :return:
+    """
+    tvi_list = [column_data.first_valid_index() - 1
+                for _, column_data in
+                df_surveys_15_in.iloc[:, lang_proficiencies_columns_range_of_interest_2015].iteritems()]
+    true_values_coordinates_results_2015 = zip(tvi_list, lang_proficiencies_columns_range_of_interest_2015)
+
+    lang_and_tech_in_2015_true_values = []
+    for row, col in true_values_coordinates_results_2015:
+        lang_and_tech_in_2015_true_values.append(df_surveys_15_in.iat[row, col])
+    df_surveys_15_out = binarize_columns_range(df=df_surveys_15_in,
+                                               col_range=lang_proficiencies_columns_range_of_interest_2015,
+                                               true_values=lang_and_tech_in_2015_true_values, inplace=False)
+    return df_surveys_15_out
