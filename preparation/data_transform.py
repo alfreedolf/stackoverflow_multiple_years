@@ -195,6 +195,7 @@ def feature_split(df: pd.DataFrame,
         df_out = df
 
     # iterating over features rows to populate features set
+    # TODO: optimize the nested for loop, i presume at least one level of nesting can be avoided.
     for index, joint_features in joint_features_series.iteritems():
         if isinstance(joint_features, str):
             # joint_features_list =
@@ -241,3 +242,8 @@ def df_2015_survey_preprocessing(df_surveys_15_in, lang_proficiencies_columns_ra
                                                col_range=lang_proficiencies_columns_range_of_interest_2015,
                                                true_values=lang_and_tech_in_2015_true_values, inplace=False)
     return df_surveys_15_out
+
+
+def drop_first_row(df_list, range_start, range_end):
+    for y in range(range_start, range_end + 1):
+        df_list[y].drop(axis=0, index=0, inplace=True)

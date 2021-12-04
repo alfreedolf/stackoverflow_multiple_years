@@ -101,3 +101,18 @@ def merge_dataframes(data_frames_dict):
         else:
             merged_df = pd.concat([merged_df[common_features_list], df[common_features_list]])
     return merged_df
+
+
+def get_10most_popular_languages_by_year(languages_popularity_df, proficiencies_by_year_data, top10languages):
+    import re
+    for year, dataset in proficiencies_by_year_data.items():
+        # retrieving data of the first 10 popular languages
+        for lang in top10languages:
+            lang_re = r'\b' + re.escape(lang) + r'\Z'
+            tmp = dataset.filter(regex=lang_re)
+            if len(tmp) > 0:
+                languages_popularity_df.loc[year, lang] = int(tmp.values[0])
+
+            else:
+                languages_popularity_df.loc[year, lang] = 0
+            del tmp
