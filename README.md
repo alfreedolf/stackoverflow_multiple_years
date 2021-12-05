@@ -16,7 +16,7 @@ There should be no necessary libraries to run the code here beyond the Anaconda 
 For this project, I was interested in using Stack Overflow data from multiple years, from 2011, to better understand:
 
 1. [What languages were the most popular in each year?](notebooks/1.LanguagesPopularityByYear.ipynb")
-2. [What are the trends in top 10 languages popularity over last 11 years?](notebooks/2.Top10LanguagesPopularityTrends.ipynb")
+2. [What trends are in top 10 languages popularity?](notebooks/2.Top10LanguagesPopularityTrends.ipynb")
 3. Does the country of origin influence the preferred/mostly used language?
 4. Does the amount of years in programming influence the preferred/mostly used language?
 5. Does the languages currently known by a developer influence the desire to learn a specific language in the future?
