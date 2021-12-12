@@ -195,7 +195,7 @@ def feature_split(df: pd.DataFrame,
         df_out = df
 
     # iterating over features rows to populate features set
-    # TODO: optimize the nested for loop, i presume at least one level of nesting can be avoided.
+    # TODO: optimize the nested for loop. I assume that at least one level of nesting can be avoided.
     for index, joint_features in joint_features_series.iteritems():
         if isinstance(joint_features, str):
             # joint_features_list =

@@ -11,7 +11,7 @@ def clean_data(df, target_feature):
     6. Create dummy columns for all the categorical variables, drop the original columns
     :param df dataframe to be cleaned
     :param target_feature: target feature to be cleaned
-    :returns X - A matrix holding all of the variables you want to consider when predicting the response
+    :returns X - A matrix holding all the variables you want to consider when predicting the response
              y - the corresponding response vector
     """
     # Drop rows with missing target_feature values
