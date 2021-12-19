@@ -198,7 +198,6 @@ def feature_split(df: pd.DataFrame,
     # TODO: optimize the nested for loop. I assume that at least one level of nesting can be avoided.
     for index, joint_features in joint_features_series.iteritems():
         if isinstance(joint_features, str):
-            # joint_features_list =
             for feat in [feat.strip() for feat in joint_features.split(sep=sep)]:
                 column_name = column_to_split + ": " + feat
                 df_out.loc[index, column_name] = 1
