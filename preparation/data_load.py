@@ -9,7 +9,6 @@ import pandas as pd
 def load_from_csv(file_path: str, encoding: str):
     """
     Loads single year survey data from CSV file
-    :param year: reference year
     :param file_path: file path to get data from
     :param encoding: cvs source file encoding
     :return: a dataframe containing raw data from survey from a single year

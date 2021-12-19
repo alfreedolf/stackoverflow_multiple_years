@@ -26,10 +26,10 @@ def transform_unnamed_cols_base(df: pd.DataFrame, base_column_name: str, columns
 
 
     :param df: input dataframe to be processed
-    :param base_column_name: base column name to be used as basis to build option columns
+    :param base_column_name: base column column_name to be used as basis to build option columns
     :param columns_look_ahead: how many columns, starting from column following the base_column_name,
     has to be transformed
-    :param new_column_name_prefix:  new name to be added as base_name to rename map
+    :param new_column_name_prefix:  new column_name to be added as base_name to rename map
     :param inplace: If False, return a copy. Otherwise, do operation inplace and return None.
     :return: input dataframe with Unnamed columns dropped and string values transformed to binary values (0,1)
     """
@@ -64,7 +64,7 @@ def transform_unnamed_cols_range(df: pd.DataFrame, columns_range: range,
 
     :param df: input dataframe to be processed
     :param columns_range: range of columns from input dataframe to be transformed
-    :param new_column_name_prefix: new name to be added as base_name to rename map
+    :param new_column_name_prefix: new column_name to be added as base_name to rename map
     :param inplace: If False, return a copy. Otherwise, do operation inplace and return None.
     :return: input dataframe with Unnamed columns dropped and string values transformed to binary values (0,1)
     """
@@ -101,7 +101,7 @@ def _categorical_columns_range_rename(df: pandas.DataFrame, target_columns: pand
     This function renames dataframe columns, from categorical data which are in the form
     :param df: input dataframe
     :param target_columns: columns to be processed
-    :param column_prefix_name: prefix to be used for new headings name
+    :param column_prefix_name: prefix to be used for new headings column_name
     :param binary_output: if true, output values of the target columns cells will be transformed to values in (0, 1)
     """
     # iterating through columns of interest, in order to create a column rename map
@@ -110,10 +110,10 @@ def _categorical_columns_range_rename(df: pandas.DataFrame, target_columns: pand
         # selecting working column
         column_suffix_name_index = df[target_columns].loc[:, col_name].first_valid_index()
 
-        # retrieving string to be used both as column suffix and as categorical name
+        # retrieving string to be used both as column suffix and as categorical column_name
         column_suffix_name = df[target_columns].loc[column_suffix_name_index, col_name]
 
-        # populating map with correct new column name
+        # populating map with correct new column column_name
         columns_rename_map[col_name] = " ".join((column_prefix_name, column_suffix_name))
         if binary_output:
             binarize_column(df, col_name, column_suffix_name)
@@ -177,7 +177,7 @@ def feature_split(df: pd.DataFrame,
     This function splits data from a single column into a set of columns
     :rtype: object
     :param df: input dataframe
-    :param column_to_split: name of the column to be split
+    :param column_to_split: column_name of the column to be split
     :param sep: separator to be used in feature splitting
     :param inplace: If False, return a copy. Otherwise, do operation inplace and return None.
     :return: optionally returns a new dataframe
@@ -185,8 +185,6 @@ def feature_split(df: pd.DataFrame,
 
     # retrieving feature values from desired column
     joint_features_series: pd.Series = df.loc[:, column_to_split]
-    # initializing empty set
-    features = set()
 
     if not inplace:
         # copying input dataframe
@@ -246,3 +244,12 @@ def df_2015_survey_preprocessing(df_surveys_15_in, lang_proficiencies_columns_ra
 def drop_first_row(df_list, range_start, range_end):
     for y in range(range_start, range_end + 1):
         df_list[y].drop(axis=0, index=0, inplace=True)
+
+
+# TODO use this function instead of dropping every single occurence of non-language features
+def find_colum_name(column_name, columns_list):
+    try:
+        # this uses a generator to find the index if it matches, will raise an exception if not found
+        return columns_list[next(i for i, v in enumerate(columns_list) if v.lower() == column_name)]
+    except:
+        return ''
