@@ -186,26 +186,39 @@ def feature_split(df: pd.DataFrame,
     # retrieving feature values from desired column
     joint_features_series: pd.Series = df.loc[:, column_to_split]
 
-    if not inplace:
-        # copying input dataframe
-        df_out = df.copy(deep=True)
-    else:
-        df_out = df
+    # splitting columns
+    df_out = column_split(df, column_to_split, joint_features_series, sep, inplace)
 
-    # iterating over features rows to populate features set
-    # TODO: optimize the nested for loop. I assume that at least one level of nesting can be avoided.
-    for index, joint_features in joint_features_series.iteritems():
-        if isinstance(joint_features, str):
-            for feat in [feat.strip() for feat in joint_features.split(sep=sep)]:
-                column_name = column_to_split + ": " + feat
-                df_out.loc[index, column_name] = 1
+    # optimized_split(split_column_prefix, df_out, joint_column, sep)
 
+    # dropping columns that has been split
     df_out.drop(labels=column_to_split, axis=1, inplace=True)
     df_out.fillna(value=0, inplace=True)
     if not inplace:
         return df_out
     else:
         return None
+
+
+def column_split(input_df, split_column_prefix, joint_column, sep, inplace: bool = True):
+    if not inplace:
+        # copying input dataframe
+        df_out = input_df.copy(deep=True)
+    else:
+        df_out = input_df
+
+    # iterating over features rows to populate features set
+    # TODO: optimize the nested for loop. I assume that at least one level of nesting can be avoided.
+    for index, joint_features in joint_column.iteritems():
+        if isinstance(joint_features, str):
+            for feat in [feat.strip() for feat in joint_features.split(sep=sep)]:
+                column_name = split_column_prefix + ": " + feat
+                df_out.loc[index, column_name] = 1
+    return df_out
+
+
+def optimized_split(joint_features_series, column_to_split, df_out, sep):
+    pass
 
 
 def string_found(string1, string2):
