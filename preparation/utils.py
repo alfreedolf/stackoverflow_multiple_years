@@ -30,7 +30,7 @@ class LanguagesStatsExtractor:
 
         return s_2011_proficiencies_top_10
 
-    def compute_language_proficiency_ranking(self, languages_proficiency_column_range, exclusion_list,
+    def compute_language_proficiency_ranking(self, languages_proficiency_column_range, exclusion_list=[],
                                              ascending=False) -> pd.Series:
         """
         Computes language proficiency ranking on source data, given a selected column range containing
@@ -38,7 +38,8 @@ class LanguagesStatsExtractor:
         :param languages_proficiency_column_range: a range variable, used to slice language proficiency from source data
         :param exclusion_list: languages to be excluded from final results
         :param ascending: if True, the returning value will be ordered in ascending order
-        :return: a Pandas Series containing language proficiency ranking
+        :return: a Pandas Series containing language proficiency ranking, obtained through summation of values
+        from selected range, excepting values from exclusion list.
         """
         # slicing features columns containing language proficiencies data
         df_proficiencies: pd.DataFrame = self.__source_data.iloc[:, languages_proficiency_column_range]
