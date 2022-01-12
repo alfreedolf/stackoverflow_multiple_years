@@ -31,12 +31,14 @@ class LanguagesStatsExtractor:
         return s_2011_proficiencies_top_10
 
     def compute_language_proficiency_ranking(self, languages_proficiency_column_range, exclusion_list=[],
-                                             ascending=False) -> pd.Series:
+                                             ignore_case=True, ascending=False) -> pd.Series:
         """
         Computes language proficiency ranking on source data, given a selected column range containing
         language proficiencies data.
         :param languages_proficiency_column_range: a range variable, used to slice language proficiency from source data
         :param exclusion_list: languages to be excluded from final results
+        :param ignore_case: if True, the method will look for elements in exclusion_list to be in source dataframe,
+        ignoring occurrences casing (upper or lower case)
         :param ascending: if True, the returning value will be ordered in ascending order
         :return: a Pandas Series containing language proficiency ranking, obtained through summation of values
         from selected range, excepting values from exclusion list.
@@ -44,9 +46,23 @@ class LanguagesStatsExtractor:
         # slicing features columns containing language proficiencies data
         df_proficiencies: pd.DataFrame = self.__source_data.iloc[:, languages_proficiency_column_range]
 
-        # excluding selected language from computation
+        # populating lower case version of column list, if requested
+        if ignore_case:
+            proficiencies_column_names_lower_to_original_mapping = [column.lower() for column in
+                                                                    df_proficiencies.columns]
+            z_it_lower_case_to_original_case = zip(proficiencies_column_names_lower_to_original_mapping,
+                                                   df_proficiencies.columns)
+            proficiencies_column_names_lower_to_original_mapping = dict(z_it_lower_case_to_original_case)
+
+        # excluding selected column, representing a language proficiency, from final computation
         for to_be_excluded in exclusion_list:
-            df_proficiencies = df_proficiencies.drop(to_be_excluded, axis=1)
+            if ignore_case and (to_be_excluded.lower() in proficiencies_column_names_lower_to_original_mapping):
+                df_proficiencies = df_proficiencies.drop(
+                    proficiencies_column_names_lower_to_original_mapping[to_be_excluded], axis=1)
+            elif not ignore_case and (to_be_excluded.lower() in proficiencies_column_names_lower_to_original_mapping):
+                df_proficiencies = df_proficiencies.drop(to_be_excluded, axis=1)
+            else:
+                print("error finding feature in axis")
 
         # computing total proficiencies
         s_2011_proficiencies_clean_sum: pd.Series = df_proficiencies.sum(axis=0)
