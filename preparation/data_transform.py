@@ -189,7 +189,7 @@ def feature_split(df: pd.DataFrame,
     # splitting columns
     df_out = column_split(df, column_to_split, joint_features_series, sep, inplace)
 
-    # optimized_split(split_column_prefix, df_out, joint_column, sep)
+    # optimized_split(split_column_prefix, df_out, joint_column, separator)
 
     # dropping columns that has been split
     df_out.drop(labels=column_to_split, axis=1, inplace=True)
@@ -200,7 +200,17 @@ def feature_split(df: pd.DataFrame,
         return None
 
 
-def column_split(input_df, split_column_prefix, joint_column, sep, inplace: bool = True):
+def column_split(input_df, split_column_prefix, joint_column, separator, inplace: bool = True):
+    """
+    This function splits input dataframe column containing all the languages separated by a separator,
+    into a set of columns containing a single language for each column.
+    :param input_df: input dataframe
+    :param split_column_prefix:
+    :param joint_column:
+    :param separator:
+    :param inplace:
+    :return:
+    """
     if not inplace:
         # copying input dataframe
         df_out = input_df.copy(deep=True)
@@ -211,7 +221,7 @@ def column_split(input_df, split_column_prefix, joint_column, sep, inplace: bool
     # TODO: optimize the nested for loop. I assume that at least one level of nesting can be avoided.
     for index, joint_features in joint_column.iteritems():
         if isinstance(joint_features, str):
-            for feat in [feat.strip() for feat in joint_features.split(sep=sep)]:
+            for feat in [feat.strip() for feat in joint_features.split(sep=separator)]:
                 column_name = split_column_prefix + ": " + feat
                 df_out.loc[index, column_name] = 1
     return df_out
