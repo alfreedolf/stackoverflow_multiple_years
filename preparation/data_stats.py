@@ -1,4 +1,34 @@
+from collections import defaultdict
+
 import pandas as pd
+
+
+def map_any_case_to_lower(any_case_input: list) -> dict:
+    """
+    This function maps a list of strings values, given as input in any case combination,
+    to a lower case corresponding key. The result is a hash map in which each element has as key a lowercase string and
+    as values a list of corresponding strings in any case combination.
+    :param any_case_input: a list of any case combination list
+    :return: a dictionary containing a list of strings corresponding to the key
+    :rtype: dict
+    """
+    output_map = defaultdict(list)
+    for s in any_case_input:
+        output_map[s.lower()].append(s)
+    return output_map
+
+
+def drop_columns_from_map(df, dropping_map, string_to_drop: str):
+    """
+
+    :param df:
+    :param dropping_map:
+    :param string_to_drop:
+    :return:
+    """
+    for tbe in dropping_map[string_to_drop]:
+        df = df.drop(tbe, axis=1)
+    return df
 
 
 class LanguagesStatsExtractor:
@@ -44,17 +74,16 @@ class LanguagesStatsExtractor:
         df_proficiencies: pd.DataFrame = self.__source_data.iloc[:, languages_proficiency_column_range]
 
         # populating lower case version of column list, if requested
-        proficiencies_column_names_lower_to_original_mapping = [column.lower()
-                                                                for column in df_proficiencies.columns]
-        z_it_lower_case_to_original_case = zip(proficiencies_column_names_lower_to_original_mapping,
-                                               df_proficiencies.columns)
-        proficiencies_lower_to_original = dict(z_it_lower_case_to_original_case)
+        # proficiencies_column_names_lower_case = [column.lower() for column in df.columns]
+        proficiencies_lower_to_original_map = map_any_case_to_lower(list(df_proficiencies.columns))
 
-        # excluding selected column, representing a language proficiency, from final computation
+        # excluding selected columns, representing proficiency
+        # (when not relevant, e.g. not a programming language) from final computation
         for to_be_excluded in exclusion_list:
-            if ignore_case and (to_be_excluded.lower() in proficiencies_column_names_lower_to_original_mapping):
-                df_proficiencies = df_proficiencies.drop(proficiencies_lower_to_original[to_be_excluded], axis=1)
-            elif not ignore_case and (to_be_excluded.lower() in proficiencies_column_names_lower_to_original_mapping):
+            if ignore_case and (to_be_excluded.lower() in proficiencies_lower_to_original_map.keys()):
+                df_proficiencies = drop_columns_from_map(df_proficiencies, proficiencies_lower_to_original_map,
+                                                         to_be_excluded)
+            elif not ignore_case and (to_be_excluded in df_proficiencies.columns):
                 df_proficiencies = df_proficiencies.drop(to_be_excluded, axis=1)
             else:
                 print("error finding feature in axis")
