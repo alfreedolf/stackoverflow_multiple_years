@@ -18,15 +18,15 @@ def map_any_case_to_lower(any_case_input: list) -> dict:
     return output_map
 
 
-def drop_columns_from_map(df, dropping_map, string_to_drop: str):
+def drop_columns_from_map(df, dropping_map, column_to_drop: str) -> pd.DataFrame:
     """
-
+    This function drops a set of columns given a dictionary of columns
     :param df:
     :param dropping_map:
-    :param string_to_drop:
-    :return:
+    :param column_to_drop:
+    :return: the input dataframe, without any occurrence of string_to_drop, in any case combination
     """
-    for tbe in dropping_map[string_to_drop]:
+    for tbe in dropping_map[column_to_drop]:
         df = df.drop(tbe, axis=1)
     return df
 
@@ -82,7 +82,7 @@ class LanguagesStatsExtractor:
         for to_be_excluded in exclusion_list:
             if ignore_case and (to_be_excluded.lower() in proficiencies_lower_to_original_map.keys()):
                 df_proficiencies = drop_columns_from_map(df_proficiencies, proficiencies_lower_to_original_map,
-                                                         to_be_excluded)
+                                                         to_be_excluded.lower())
             elif not ignore_case and (to_be_excluded in df_proficiencies.columns):
                 df_proficiencies = df_proficiencies.drop(to_be_excluded, axis=1)
             else:
