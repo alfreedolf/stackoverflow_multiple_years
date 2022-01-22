@@ -26,12 +26,13 @@ There will be 4 notebooks available here to showcase work related to the above q
 Each of the notebooks will be exploratory in searching through the data pertaining to the questions showcased by the
 notebook title.<br/>
 Markdown cells were used to assist in walking through the thought process for individual steps.
-</br>Here follows the list of Jupyter Notebooks part of the analysis:
+</br>Here follows the list of Jupyter Notebooks part of the analysis (each of them will give an answer to the above
+listed questions):
 
 1. [What languages were the most popular in each year?](notebooks/1.LanguagesPopularityByYear.ipynb)
 2. [What trends are in top 10 languages popularity?](notebooks/2.Top10LanguagesPopularityTrends.ipynb)
 3. Does the country of origin influence the preferred/mostly used language?
-4. Does the amount of years in programming influence the preferred/mostly used language?
+4. Does the amount of years in programming influence the preferred/most used programming language?
 
 In addition to above listed notebooks, a presentational notebook, containing also all data load operations, named
 [Analysis Presentation](notebooks/0.AnalysisPresentation.ipynb).
