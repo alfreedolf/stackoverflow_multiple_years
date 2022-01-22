@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from collections import defaultdict
 
 import pandas as pd
@@ -31,16 +32,31 @@ def drop_columns_from_map(df, dropping_map, column_to_drop: str) -> pd.DataFrame
     return df
 
 
-class LanguagesStatsExtractor:
+class LanguagesStatsExtractor(ABC):
+    """
+    This is just an abstract base class that allows to define specific kind of stats extraction from a Dataframe
+    """
+
+    @abstractmethod
+    def __init__(self, source_data: pd.DataFrame):
+        self.__source_data = source_data
+
+    @abstractmethod
+    def get_stats(self) -> dict:
+        pass
+
+
+class LanguagesRankingExtractor(LanguagesStatsExtractor):
 
     def __init__(self, source_data: pd.DataFrame):
         self.__source_data = source_data
 
-    def compute_top_ten_languages(self, languages_proficiency_column_range, exclusion_list=[],
+    def compute_top_ten_languages(self, columns_selection_criteria=None, exclusion_list=[],
                                   ignore_case=True) -> pd.Series:
         """
         Computes top ten languages by proficiency.
-        :param languages_proficiency_column_range: a range variable, used to slice language proficiency from source data
+        :param columns_selection_criteria: a range variable or a string,
+        used to slice language proficiency from source data
         :param exclusion_list: languages to be excluded from final results
         :param ignore_case: if True, the method will look for elements in exclusion_list to be in source dataframe,
         ignoring occurrences casing (upper or lower case)
@@ -48,8 +64,11 @@ class LanguagesStatsExtractor:
         to the least popular.
         """
 
+        if columns_selection_criteria is None:
+            columns_selection_criteria = range(0, self.__source_data.shape[1])
+
         # retrieving languages proficiencies ranking in descending order
-        s_2011_proficiencies_clean_sum = self.compute_language_proficiency_ranking(languages_proficiency_column_range,
+        s_2011_proficiencies_clean_sum = self.compute_language_proficiency_ranking(columns_selection_criteria,
                                                                                    exclusion_list, ignore_case)
 
         # storing top ten elements by popularity in a dedicated pandas series
@@ -57,21 +76,27 @@ class LanguagesStatsExtractor:
 
         return s_2011_proficiencies_top_10
 
-    def compute_language_proficiency_ranking(self, languages_proficiency_column_range, exclusion_list=[],
+    def compute_language_proficiency_ranking(self, columns_selection_criteria, exclusion_list=[],
                                              ignore_case=True, ascending=False) -> pd.Series:
         """
         Computes language proficiency ranking on source data, given a selected column range containing
         language proficiencies data.
-        :param languages_proficiency_column_range: a range variable, used to slice language proficiency from source data
-        :param exclusion_list: languages to be excluded from final results
+        :param columns_selection_criteria: a range variable or a string,
+        used to slice language proficiency from source data.
+        :param exclusion_list: languages to be excluded from final results.
         :param ignore_case: if True, the method will look for elements in exclusion_list to be in source dataframe,
-        ignoring occurrences casing (upper or lower case)
-        :param ascending: if True, the returning value will be ordered in ascending order
-        :return: a Pandas Series containing language proficiency ranking, obtained through summation of values
+        ignoring occurrences casing (upper or lower case).
+        :param ascending: if True, the returning value will be ordered in ascending order.
+        :return: a Pandas Series containing language proficiency ranking, obtained through summation of values.
         from selected range, excepting values from exclusion list.
         """
+        # filtering dataframe in case of string value as input columns_selection_criteria parameter
+        if isinstance(columns_selection_criteria, str):
+            df_proficiencies: pd.DataFrame = self.__source_data.filter(like=columns_selection_criteria)
         # slicing features columns containing language proficiencies data
-        df_proficiencies: pd.DataFrame = self.__source_data.iloc[:, languages_proficiency_column_range]
+        # in case of range value as input as columns_selection_criteria parameter
+        elif isinstance(columns_selection_criteria, range):
+            df_proficiencies: pd.DataFrame = self.__source_data.iloc[:, columns_selection_criteria]
 
         # populating lower case version of column list, if requested
         # proficiencies_column_names_lower_case = [column.lower() for column in df.columns]
@@ -95,3 +120,11 @@ class LanguagesStatsExtractor:
         s_2011_proficiencies_clean_sum.sort_values(ascending=ascending, inplace=True)
 
         return s_2011_proficiencies_clean_sum
+
+    def get_stats(self) -> dict:
+        """
+        This method returns a dictionary holding two values: full ranking and top ten languages from input dataframe
+        :return: a dictionary holding two values: full ranking and top ten languages from input dataframe.
+        """
+        return {'full ranking': self.compute_language_proficiency_ranking(),
+                'top ten': self.compute_top_ten_languages()}
