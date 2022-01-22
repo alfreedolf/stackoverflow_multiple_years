@@ -1,8 +1,9 @@
 from unittest import TestCase
 
+import numpy as np
 import pandas as pd
 
-from preparation.data_stats import map_any_case_to_lower, drop_columns_from_map
+from preparation.data_stats import map_any_case_to_lower, drop_columns_from_map, LanguagesRankingExtractor
 
 
 # class TestLanguagesStatsExtractor(TestCase):
@@ -37,3 +38,49 @@ class TestDropColumnsFromLowerCaseMap(TestCase):
         df_output = drop_columns_from_map(self.df_input, dropping_map=self.expected_output_map,
                                           column_to_drop=self.column_to_drop.lower())
         self.assertEqual(df_output.columns, self.df_expected_output.columns)
+
+
+class TestLanguagesRankingExtractor(TestCase):
+
+    def setUp(self) -> None:
+        # input dataframe initialization
+        # input index
+        self.input_index = [1, 2, 3, 4]
+
+        # input columns
+        self.input_columns = ['Proficient in Java', 'Proficient in C++', 'Proficient in C#', 'Proficient in Python',
+                              'Proficient in Ruby', 'Proficient in C', 'Proficient in JavaScript',
+                              'Proficient in Objective-C', 'Proficient in Visual Basic', 'Proficient in PHP']
+
+        # input data
+        data = [[1, 0, 1, 0, 1, 1, 1, 1, 1, 0],
+                [1, 1, 0, 1, 0, 0, 1, 0, 0, 1],
+                [0, 0, 1, 1, 0, 1, 1, 0, 1, 1],
+                [1, 1, 0, 1, 0, 0, 1, 0, 0, 1]]
+        self.df_input = pd.DataFrame(data=data, index=self.input_index, columns=self.input_columns)
+
+        # expected output
+        self.s_expected_output_index = ['Proficient in JavaScript', 'Proficient in Java', 'Proficient in Python',
+                                        'Proficient in PHP', 'Proficient in C++', 'Proficient in C#',
+                                        'Proficient in C', 'Proficient in Visual Basic', 'Proficient in Ruby',
+                                        'Proficient in Objective-C']
+        self.s_expected_output = pd.Series(index=self.s_expected_output_index, data=[4, 3, 3, 3, 2, 2, 2, 2, 1, 1])
+
+        # input LanguagesStatsExtractor
+        self.lre = LanguagesRankingExtractor(self.df_input)
+
+    def test_compute_top_ten_languages(self):
+        # check for index equality
+        with self.subTest():
+            np.testing.assert_array_equal(self.lre.compute_top_ten_languages().index.values,
+                                          self.s_expected_output.index.values)
+        # check for values equality
+        with self.subTest():
+            np.testing.assert_array_equal(self.lre.compute_top_ten_languages().values,
+                                          self.s_expected_output.values)
+
+    def test_compute_language_proficiency_ranking(self):
+        pass
+
+    def test_get_stats(self):
+        pass
