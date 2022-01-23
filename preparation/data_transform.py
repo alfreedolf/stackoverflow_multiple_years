@@ -1,7 +1,6 @@
 import re
 from typing import Dict, Optional
 
-import pandas
 import pandas as pd
 from pandas import DataFrame
 
@@ -76,7 +75,7 @@ def transform_unnamed_cols_range(df: pd.DataFrame, columns_range: range,
                                              new_column_name_prefix=new_column_name_prefix, inplace=inplace)
 
 
-def _even_out_categorical_as_binaries(df: pandas.DataFrame, df_target_columns: pandas.DataFrame,
+def _even_out_categorical_as_binaries(df: pd.DataFrame, df_target_columns: pd.DataFrame,
                                       new_column_name_prefix: str, inplace: bool) -> object:
     """
     This function will even out a range of columns containing string values into a range of binary values in [0,1]
@@ -95,7 +94,7 @@ def _even_out_categorical_as_binaries(df: pandas.DataFrame, df_target_columns: p
         return None
 
 
-def _categorical_columns_range_rename(df: pandas.DataFrame, target_columns: pandas.Index,
+def _categorical_columns_range_rename(df: pd.DataFrame, target_columns: pd.Index,
                                       column_prefix_name: str, binary_output: bool = True) -> None:
     """
     This function renames dataframe columns, from categorical data which are in the form
@@ -121,7 +120,7 @@ def _categorical_columns_range_rename(df: pandas.DataFrame, target_columns: pand
     df.rename(columns=columns_rename_map, inplace=True)
 
 
-def binarize_column(df: pandas.DataFrame, col_name: str, true_val: str, inplace: bool = True) -> Optional[DataFrame]:
+def binarize_column(df: pd.DataFrame, col_name: str, true_val: str, inplace: bool = True) -> Optional[DataFrame]:
     """
     Transforms a single column to binary values, converting specific values to '1' and all the other values to '0'
     :param df: input dataframe
@@ -139,7 +138,7 @@ def binarize_column(df: pandas.DataFrame, col_name: str, true_val: str, inplace:
         return None
 
 
-def binarize_columns_range(df: pandas.DataFrame, col_range: range, true_values: list,
+def binarize_columns_range(df: pd.DataFrame, col_range: range, true_values: list,
                            inplace: bool = True) -> Optional[DataFrame]:
     """
     Transforms a set of columns (a dataframe) to binary values
@@ -177,7 +176,8 @@ def feature_split(df: pd.DataFrame,
     This function splits data from a single column into a set of columns
     :rtype: object
     :param df: input dataframe
-    :param column_to_split: column_name of the column to be split
+    :param column_to_split: column_name of the column to be split, it will be used both to locate the column
+    in dataframe and as a prefix of the output columns.
     :param sep: separator to be used in feature splitting
     :param inplace: If False, return a copy. Otherwise, do operation inplace and return None.
     :return: optionally returns a new dataframe
@@ -187,11 +187,11 @@ def feature_split(df: pd.DataFrame,
     joint_features_series: pd.Series = df.loc[:, column_to_split]
 
     # splitting columns
-    df_out = column_split(df, column_to_split, joint_features_series, sep, inplace)
+    # df_out = column_split(df, joint_features_series, sep, column_to_split, inplace)
 
-    # optimized_split(split_column_prefix, df_out, joint_column, separator)
+    df_out = optimized_column_split(df, joint_features_series, sep, column_to_split, inplace)
 
-    # dropping columns that has been split
+    # dropping columns that have been split
     df_out.drop(labels=column_to_split, axis=1, inplace=True)
     df_out.fillna(value=0, inplace=True)
     if not inplace:
@@ -200,13 +200,14 @@ def feature_split(df: pd.DataFrame,
         return None
 
 
-def column_split(input_df, split_column_prefix, joint_column, separator, inplace: bool = True):
+def column_split(input_df: pd.DataFrame, joint_column: pd.Series,
+                 separator: str, split_column_prefix: str, inplace: bool = True):
     """
     This function splits input dataframe column containing all the languages separated by a separator,
     into a set of columns containing a single language for each column.
     :param input_df: input dataframe
-    :param split_column_prefix:
-    :param joint_column:
+    :param joint_column: column to be split, to be fed as a Pandas Series
+    :param split_column_prefix: prefix of the new column name
     :param separator:
     :param inplace:
     :return:
@@ -227,8 +228,32 @@ def column_split(input_df, split_column_prefix, joint_column, separator, inplace
     return df_out
 
 
-def optimized_split(joint_features_series, column_to_split, df_out, sep):
-    pass
+def optimized_column_split(input_df: pd.DataFrame, joint_column: pd.Series, separator: str, split_column_prefix: str,
+                           inplace: bool = True):
+    """
+    This function splits input dataframe column containing all the languages separated by a separator,
+    into a set of columns containing a single language for each column.
+    :param input_df: input dataframe
+    :param joint_column: column to be split, to be fed as a Pandas Series
+    :param split_column_prefix: prefix of the new column name
+    :param separator:
+    :param inplace:
+    :return:
+    """
+    if not inplace:
+        # copying input dataframe
+        df_out = input_df.copy(deep=True)
+    else:
+        df_out = input_df
+
+    # iterating over features rows to populate features set
+    for index, joint_features in joint_column.iteritems():
+        if isinstance(joint_features, str):
+            for feat in joint_features.split(sep=separator):
+                column_name = split_column_prefix + ": " + feat.strip()
+                df_out.loc[index, column_name] = 1
+
+    return df_out
 
 
 def string_found(string1, string2):
