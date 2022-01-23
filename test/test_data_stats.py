@@ -60,14 +60,14 @@ class TestLanguagesRankingExtractor(TestCase):
         self.df_input = pd.DataFrame(data=data, index=self.input_index, columns=self.input_columns)
 
         # expected output
-        self.s_expected_output_index = ['Proficient in JavaScript', 'Proficient in Java', 'Proficient in Python',
-                                        'Proficient in PHP', 'Proficient in C++', 'Proficient in C#',
-                                        'Proficient in C', 'Proficient in Visual Basic', 'Proficient in Ruby',
-                                        'Proficient in Objective-C']
+        self.s_expected_output_index = ['JavaScript', 'Java', 'Python',
+                                        'PHP', 'C++', 'C#',
+                                        'C', 'Visual Basic', 'Ruby',
+                                        'Objective-C']
         self.s_expected_output = pd.Series(index=self.s_expected_output_index, data=[4, 3, 3, 3, 2, 2, 2, 2, 1, 1])
 
         # input LanguagesStatsExtractor
-        self.lre = LanguagesRankingExtractor(self.df_input)
+        self.lre = LanguagesRankingExtractor(source_data=self.df_input, prefix_to_remove='Proficient in ')
 
     def test_compute_top_ten_languages(self):
         # check for index equality
