@@ -52,8 +52,8 @@ class LanguagesStatsExtractor(ABC):
 
 class LanguagesRankingExtractor(LanguagesStatsExtractor):
 
-    def __init__(self, source_data: pd.DataFrame, columns_selection_criteria,
-                 exclusion_list=[], prefix_to_remove=''):
+    def __init__(self, source_data: pd.DataFrame, columns_selection_criteria=None,
+                 exclusion_list=[], entries_merge_list=[], prefix_to_remove=''):
         """
 
         :param source_data:
@@ -61,11 +61,14 @@ class LanguagesRankingExtractor(LanguagesStatsExtractor):
         used to slice language proficiency from source data.
         :param exclusion_list: languages to be excluded from final results
         :param prefix_to_remove: an optional string to be removed from returned series index
+        :param entries_merge_list: this should be a list of couples. If provided, it will add values from tuple second
+        element label to tuple first element label.
         """
         self.__source_data = source_data
         self.__columns_selection_criteria = columns_selection_criteria
         self.__prefix_to_remove = prefix_to_remove
         self.__exclusion_list = exclusion_list
+        self.__entries_merge_list = entries_merge_list
 
     def compute_top_ten_languages(self, ignore_case=True) -> pd.Series:
         """
@@ -108,6 +111,8 @@ class LanguagesRankingExtractor(LanguagesStatsExtractor):
         # in case of range value as input as languages_proficiency_columns parameter
         elif isinstance(self.__columns_selection_criteria, range):
             df_proficiencies: pd.DataFrame = self.__source_data.iloc[:, self.__columns_selection_criteria]
+        else:
+            df_proficiencies: pd.DataFrame = self.__source_data
 
         # populating lower case version of column list, if requested
         # proficiencies_column_names_lower_case = [column.lower() for column in df.columns]
@@ -123,6 +128,11 @@ class LanguagesRankingExtractor(LanguagesStatsExtractor):
                 df_proficiencies = df_proficiencies.drop(to_be_excluded, axis=1)
             else:
                 print("error finding feature in axis")
+
+        # merging entries from entries_merge_list
+        if entries_merge_list is not None:
+            for t in entries_merge_list:
+                df_proficiencies[t[0]] += df_proficiencies[t[1]]
 
         # computing total proficiencies
         s_proficiencies_clean_sum: pd.Series = df_proficiencies.sum(axis=0)
