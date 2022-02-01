@@ -129,10 +129,14 @@ class LanguagesRankingExtractor(LanguagesStatsExtractor):
             else:
                 print("error finding feature in axis")
 
-        # merging entries from entries_merge_list
-        if entries_merge_list is not None:
-            for t in entries_merge_list:
-                df_proficiencies[t[0]] += df_proficiencies[t[1]]
+        # merging entries from entries_merge_list, if not empty
+        if self.__entries_merge_list:
+            for t in self.__entries_merge_list:
+                # summing columns to be merged
+                df_proficiencies.loc[self.__prefix_to_remove + t[0] == 0] += df_proficiencies[
+                    self.__prefix_to_remove + t[1]]
+                # dropping merged column
+                df_proficiencies = df_proficiencies.drop(self.__prefix_to_remove + t[1], axis=1)
 
         # computing total proficiencies
         s_proficiencies_clean_sum: pd.Series = df_proficiencies.sum(axis=0)
