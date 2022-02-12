@@ -133,13 +133,15 @@ class LanguagesRankingExtractor(LanguagesStatsExtractor):
         if self.__entries_merge_list:
             for t in self.__entries_merge_list:
                 # summing columns to be merged
-                df_proficiencies.loc[self.__prefix_to_remove + t[0] == 0] += df_proficiencies[
-                    self.__prefix_to_remove + t[1]]
+                merger = self.__prefix_to_remove + t[0]
+                mergee = self.__prefix_to_remove + t[1]
+                condition_row = df_proficiencies[merger] == 0
+                df_proficiencies.loc[condition_row, merger] = df_proficiencies.loc[condition_row, mergee]
                 # dropping merged column
-                df_proficiencies = df_proficiencies.drop(self.__prefix_to_remove + t[1], axis=1)
+                df_proficiencies.drop(mergee, axis=1, inplace=True)
 
         # computing total proficiencies
-        s_proficiencies_clean_sum: pd.Series = df_proficiencies.sum(axis=0)
+        s_proficiencies_clean_sum: pd.Series = df_proficiencies.sum(axis=0, numeric_only=True)
 
         # sorting values by popularity
         s_proficiencies_clean_sum.sort_values(ascending=ascending, inplace=True)
