@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 
 import pandas as pd
+from pandas import DataFrame
 
 
 def map_any_case_to_lower(any_case_input: list) -> dict:
@@ -42,7 +43,7 @@ class LanguagesStatsExtractor(ABC):
         self.__source_data = source_data
 
     @abstractmethod
-    def get_data_source(self) -> dict:
+    def get_data_source(self) -> DataFrame:
         return self.__source_data
 
     @abstractmethod
@@ -53,9 +54,10 @@ class LanguagesStatsExtractor(ABC):
 class LanguagesRankingExtractor(LanguagesStatsExtractor):
 
     def __init__(self, source_data: pd.DataFrame, columns_selection_criteria=None,
-                 exclusion_list=[], entries_merge_list=[], prefix_to_remove=''):
+                 exclusion_list=None, entries_merge_list=None, prefix_to_remove=''):
         """
 
+        :type entries_merge_list: list
         :param source_data:
         :param columns_selection_criteria: a range variable or a string,
         used to slice language proficiency from source data.
@@ -64,6 +66,10 @@ class LanguagesRankingExtractor(LanguagesStatsExtractor):
         :param entries_merge_list: this should be a list of couples. If provided, it will add values from tuple second
         element label to tuple first element label.
         """
+        if entries_merge_list is None:
+            entries_merge_list = []
+        if exclusion_list is None:
+            exclusion_list = []
         self.__source_data = source_data
         self.__columns_selection_criteria = columns_selection_criteria
         self.__prefix_to_remove = prefix_to_remove
@@ -79,6 +85,7 @@ class LanguagesRankingExtractor(LanguagesStatsExtractor):
         to the least popular.
         """
 
+        # TODO check for removal
         if self.__columns_selection_criteria is None:
             columns_selection_criteria = range(0, self.__source_data.shape[1])
 
@@ -165,8 +172,8 @@ class LanguagesProficienciesPercentages(LanguagesStatsExtractor):
     This class computes languages proficiencies percentages
     """
 
-    def get_data_source(self) -> dict:
-        return self.__source_data
+    def get_data_source(self) -> DataFrame:
+        return self.__lre.get_data_source()
 
     def __init__(self, languages_ranking_extractor: LanguagesRankingExtractor):
         self.__lre = languages_ranking_extractor
@@ -190,6 +197,8 @@ class LanguagesProficienciesPercentages(LanguagesStatsExtractor):
     def get_stats(self) -> dict:
         """
         This function returns both proficiency percentages
-        :return: both full percentages and top ten languages percentages
+        :return: number of respondents, proficiency percentages and top ten languages percentages
         """
-        return {'full percentages': self.get_percentages(), 'top ten percentages': self.get_top_ten_percentages()}
+        return {'number respondents': self.get_data_source().shape[1],
+                'proficiency percentages': self.get_percentages(),
+                'top ten proficiency percentages': self.get_top_ten_percentages()}

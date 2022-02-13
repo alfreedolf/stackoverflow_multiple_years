@@ -50,13 +50,14 @@ class TestLanguagesRankingExtractor(TestCase):
         # input columns
         self.input_columns = ['Proficient in Java', 'Proficient in C++', 'Proficient in C#', 'Proficient in Python',
                               'Proficient in Ruby', 'Proficient in C', 'Proficient in JavaScript',
-                              'Proficient in Objective-C', 'Proficient in Visual Basic', 'Proficient in PHP']
+                              'Proficient in Objective-C', 'Proficient in Visual Basic', 'Proficient in PHP',
+                              'Proficient in Node.js', 'Proficient in jQuery']
 
         # input data
-        data = [[1, 0, 1, 0, 1, 1, 1, 1, 1, 0],
-                [1, 1, 0, 1, 0, 0, 1, 0, 0, 1],
-                [0, 0, 1, 1, 0, 1, 1, 0, 1, 1],
-                [1, 1, 0, 1, 0, 0, 1, 0, 0, 1]]
+        data = [[1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0],
+                [1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0],
+                [0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1],
+                [1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0]]
         self.df_input = pd.DataFrame(data=data, index=self.input_index, columns=self.input_columns)
 
         # expected output
@@ -66,21 +67,30 @@ class TestLanguagesRankingExtractor(TestCase):
                                         'Objective-C']
         self.s_expected_output = pd.Series(index=self.s_expected_output_index, data=[4, 3, 3, 3, 2, 2, 2, 2, 1, 1])
 
+        # entries merge list
+        self.entries_merge_list = [""]
+
         # input LanguagesStatsExtractor
-        self.lre = LanguagesRankingExtractor(source_data=self.df_input, prefix_to_remove='Proficient in ')
+        self.lre = LanguagesRankingExtractor(source_data=self.df_input, prefix_to_remove='Proficient in ',
+                                             entries_merge_list=[('JavaScript', 'Node.js'), ('JavaScript', 'jQuery')])
 
     def test_compute_top_ten_languages(self):
+        top_ten_languages_df: pd.DataFrame = self.lre.compute_top_ten_languages()
         # check for index equality
         with self.subTest():
-            np.testing.assert_array_equal(self.lre.compute_top_ten_languages().index.values,
+            np.testing.assert_array_equal(top_ten_languages_df.index.values,
                                           self.s_expected_output.index.values)
         # check for values equality
         with self.subTest():
-            np.testing.assert_array_equal(self.lre.compute_top_ten_languages().values,
+            np.testing.assert_array_equal(top_ten_languages_df.values,
                                           self.s_expected_output.values)
 
     def test_compute_language_proficiency_ranking(self):
+        # TODO add test
+        # language_proficiencies_ranking_df = self.lre.compute_language_proficiency_ranking()
         pass
 
     def test_get_stats(self):
+        # TODO add test
         pass
+
