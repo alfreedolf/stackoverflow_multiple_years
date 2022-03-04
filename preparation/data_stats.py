@@ -138,14 +138,7 @@ class LanguagesRankingExtractor(LanguagesStatsExtractor):
 
         # merging entries from entries_merge_list, if not empty
         if self.__entries_merge_list:
-            for t in self.__entries_merge_list:
-                # summing columns to be merged
-                merger = self.__prefix_to_remove + t[0]
-                mergee = self.__prefix_to_remove + t[1]
-                condition_row = df_proficiencies[merger] == 0
-                df_proficiencies.loc[condition_row, merger] = df_proficiencies.loc[condition_row, mergee]
-                # dropping merged column
-                df_proficiencies.drop(mergee, axis=1, inplace=True)
+            self.merge_entries(df_proficiencies, self.__entries_merge_list)
 
         # computing total proficiencies
         s_proficiencies_clean_sum: pd.Series = df_proficiencies.sum(axis=0, numeric_only=True)
@@ -154,6 +147,21 @@ class LanguagesRankingExtractor(LanguagesStatsExtractor):
         s_proficiencies_clean_sum.sort_values(ascending=ascending, inplace=True)
 
         return s_proficiencies_clean_sum
+
+    def merge_entries(self, df_proficiencies: pd.DataFrame, entries_merge_list: list) -> None:
+        """
+        Method that merges proficiencies entries
+        :param df_proficiencies: input dataframe
+        :param entries_merge_list: entries tuples merge list
+        """
+        for t in entries_merge_list:
+            # summing columns to be merged
+            merger = self.__prefix_to_remove + t[0]
+            mergee = self.__prefix_to_remove + t[1]
+            condition_row = df_proficiencies[merger] == 0
+            df_proficiencies.loc[condition_row, merger] = df_proficiencies.loc[condition_row, mergee]
+            # dropping merged column
+            df_proficiencies.drop(mergee, axis=1, inplace=True)
 
     def get_stats(self) -> dict:
         """

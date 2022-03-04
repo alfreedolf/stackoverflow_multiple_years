@@ -94,3 +94,6 @@ class TestLanguagesRankingExtractor(TestCase):
         # TODO add test
         pass
 
+    def test_merge_entries(selfs):
+        # TODO add test
+        pass
