@@ -20,7 +20,7 @@ def map_any_case_to_lower(any_case_input: list) -> dict:
     return output_map
 
 
-def drop_columns_from_map(df, dropping_map, column_to_drop: str) -> pd.DataFrame:
+def drop_columns_from_map(df: object, dropping_map: object, column_to_drop: str) -> None:
     """
     This function drops a set of columns given a dictionary of columns
     :param df:
@@ -28,9 +28,11 @@ def drop_columns_from_map(df, dropping_map, column_to_drop: str) -> pd.DataFrame
     :param column_to_drop:
     :return: the input dataframe, without any occurrence of string_to_drop, in any case combination
     """
+
+    # TODO snippet suspected to be source of "SettingWithCopyWarning" in Jupyter Notebook...
+    #  Figuring out a strategy to solve the issue...
     for tbe in dropping_map[column_to_drop]:
-        df = df.drop(tbe, axis=1)
-    return df
+        df.drop(tbe, axis=1, inplace=True)
 
 
 class LanguagesStatsExtractor(ABC):
@@ -129,10 +131,10 @@ class LanguagesRankingExtractor(LanguagesStatsExtractor):
         # (when not relevant, e.g. not a programming language) from final computation
         for to_be_excluded in self.__exclusion_list:
             if ignore_case and (to_be_excluded.lower() in proficiencies_lower_to_original_map.keys()):
-                df_proficiencies = drop_columns_from_map(df_proficiencies, proficiencies_lower_to_original_map,
-                                                         to_be_excluded.lower())
+                drop_columns_from_map(df_proficiencies, proficiencies_lower_to_original_map,
+                                      to_be_excluded.lower())
             elif not ignore_case and (to_be_excluded in df_proficiencies.columns):
-                df_proficiencies = df_proficiencies.drop(to_be_excluded, axis=1)
+                df_proficiencies.drop(to_be_excluded, axis=1, inplace=True)
             else:
                 print("error finding feature in axis")
 
@@ -158,7 +160,9 @@ class LanguagesRankingExtractor(LanguagesStatsExtractor):
             # summing columns to be merged
             merger = self.__prefix_to_remove + t[0]
             mergee = self.__prefix_to_remove + t[1]
-            condition_row = df_proficiencies[merger] == 0
+            # rows where reference data (merger) used in final statistics has a "miss", i.e. is set to '0'
+            condition_row = df_proficiencies.loc[:, merger] == 0
+
             df_proficiencies.loc[condition_row, merger] = df_proficiencies.loc[condition_row, mergee]
             # dropping merged column
             df_proficiencies.drop(mergee, axis=1, inplace=True)
