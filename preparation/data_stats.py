@@ -27,12 +27,11 @@ def drop_columns_from_map(df: object, dropping_map: object, column_to_drop: str)
     :param dropping_map:
     :param column_to_drop:
     :return: the input dataframe, without any occurrence of string_to_drop, in any case combination
-    """
-
-    # TODO snippet suspected to be source of "SettingWithCopyWarning" in Jupyter Notebook...
-    #  Figuring out a strategy to solve the issue...
+    """ 
     for tbe in dropping_map[column_to_drop]:
-        df.drop(tbe, axis=1, inplace=True)
+        # "SettingWithCopyWarning" in Jupyter Notebook solved, going from:
+        # df.drop(tbe, axis=1, inplace=True) to:
+        df = df.drop(tbe, axis=1, inplace=False)
 
 
 class LanguagesStatsExtractor(ABC):

@@ -31,8 +31,9 @@ def load_surveys_data_from_csv(years=None, data_path="data", encoding="ISO-8859-
 
     # dictionary containing years dat
     surveys_years_df = {}
-    # retrieving base directory where data folder is expected to be located
-    base_dir = os.path.split(os.getcwd())[0]
+    # retrieving base directory where data folder is expected to be located 
+    base_dir = os.getcwd()
+    # base_dir = os.path.split(os.getcwd())[0]
     for y in years:
         surveys_years_df[y] = load_from_csv(os.path.join(base_dir, data_path,
                                                          '{}_results.csv'.format(y)), encoding)
