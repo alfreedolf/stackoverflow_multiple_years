@@ -2,3 +2,6 @@
 __pycache__/
 *.py[cod]
 .vscode/*
+data/*
+.idea/*
+notebooks/.ipynb_checkpoints/
