@@ -20,7 +20,7 @@ def map_any_case_to_lower(any_case_input: list) -> dict:
     return output_map
 
 
-def drop_columns_from_map(df: object, dropping_map: object, column_to_drop: str) -> None:
+def drop_columns_from_map(df: object, dropping_map: object, column_to_drop: str) -> pd.DataFrame:
     """
     This function drops a set of columns given a dictionary of columns
     :param df:
@@ -32,6 +32,7 @@ def drop_columns_from_map(df: object, dropping_map: object, column_to_drop: str)
         # "SettingWithCopyWarning" in Jupyter Notebook solved, going from:
         # df.drop(tbe, axis=1, inplace=True) to:
         df = df.drop(tbe, axis=1, inplace=False)
+    return df
 
 
 class LanguagesStatsExtractor(ABC):
@@ -87,8 +88,8 @@ class LanguagesRankingExtractor(LanguagesStatsExtractor):
         """
 
         # TODO check for removal
-        if self.__columns_selection_criteria is None:
-            columns_selection_criteria = range(0, self.__source_data.shape[1])
+        # if self.__columns_selection_criteria is None:
+        #     columns_selection_criteria = range(0, self.__source_data.shape[1])
 
         # retrieving languages proficiencies ranking in descending order
         s_proficiencies_clean_sum = self.compute_language_proficiency_ranking(ignore_case=ignore_case)

@@ -1,3 +1,4 @@
+import os
 import unittest
 from typing import Optional, Hashable
 
@@ -16,7 +17,9 @@ class TestUnnamedColumnsTransformation(unittest.TestCase):
 
     def setUp(self) -> None:
         # data load
-        self.results_2011_df = pd.read_csv("../data/2011_results.csv", encoding="ISO-8859-1")
+        base_dir = os.getcwd()
+        results_2011_file_path = os.path.join(base_dir, 'data', '2011_results.csv')
+        self.results_2011_df = pd.read_csv(results_2011_file_path, encoding="ISO-8859-1")
 
         # range of interest definition
         self.results_2011_base_column_name = "Which languages are you proficient in?"

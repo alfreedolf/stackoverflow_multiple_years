@@ -1,3 +1,4 @@
+import os
 import unittest
 
 import numpy as np
@@ -28,7 +29,9 @@ class TestBinarization(unittest.TestCase):
         self.df_binarizable = pd.DataFrame(data=dummy_lp_data)
 
         # data load
-        self.results_2015_df = pd.read_csv("../data/2015_results.csv", encoding="ISO-8859-1")
+        base_dir = os.getcwd()
+        results_2015_file_path = os.path.join(base_dir, 'data', '2015_results.csv')
+        self.results_2015_df = pd.read_csv(results_2015_file_path, encoding="ISO-8859-1")
 
         # fixing 2015 results header
         new_2015_header = self.results_2015_df.iloc[0]

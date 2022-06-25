@@ -36,3 +36,13 @@ def clean_data(df, target_feature):
 
     X = df
     return X, y
+
+def calculate_time_between_dates(date1, date2):
+    """
+    This function calculates the time between two dates
+    :param date1: first date
+    :param date2: second date
+    :returns time_between_dates: time between two dates
+    """
+    time_between_dates = abs(date1 - date2)
+    return time_between_dates.days
