@@ -77,6 +77,8 @@ class LanguagesRankingExtractor(LanguagesStatsExtractor):
         self.__prefix_to_remove = prefix_to_remove
         self.__exclusion_list = exclusion_list
         self.__entries_merge_list = entries_merge_list
+        self.__language_proficiency_ranking = None
+        self.__top_ten_languages = None
 
     def compute_top_ten_languages(self, ignore_case=True) -> pd.Series:
         """
@@ -90,17 +92,19 @@ class LanguagesRankingExtractor(LanguagesStatsExtractor):
         # TODO check for removal
         # if self.__columns_selection_criteria is None:
         #     columns_selection_criteria = range(0, self.__source_data.shape[1])
-
-        # retrieving languages proficiencies ranking in descending order
-        s_proficiencies_clean_sum = self.compute_language_proficiency_ranking(ignore_case=ignore_case)
+        if self.__language_proficiency_ranking is None:
+            # retrieving languages proficiencies ranking in descending order
+            self.__language_proficiency_ranking = self.compute_language_proficiency_ranking(ignore_case=ignore_case)
 
         # storing top ten elements by popularity in a dedicated pandas series
-        s_proficiencies_top_10 = s_proficiencies_clean_sum.head(10)
+        self.__top_ten_languages = self.__language_proficiency_ranking.iloc[:10]
+        # s_proficiencies_top_10 = self.__language_proficiency_ranking.head(10)
 
         # rectifying index name as requested
-        s_proficiencies_top_10.index = s_proficiencies_top_10.index.str.replace(self.__prefix_to_remove, '')
+        self.__top_ten_languages.index = self.__top_ten_languages.index.str.replace(self.__prefix_to_remove, '')
+        # s_proficiencies_top_10.index = s_proficiencies_top_10.index.str.replace(self.__prefix_to_remove, '')
 
-        return s_proficiencies_top_10
+        return self.__top_ten_languages
 
     def compute_language_proficiency_ranking(self, ignore_case=True, ascending=False) -> pd.Series:
         """
@@ -131,7 +135,7 @@ class LanguagesRankingExtractor(LanguagesStatsExtractor):
         # (when not relevant, e.g. not a programming language) from final computation
         for to_be_excluded in self.__exclusion_list:
             if ignore_case and (to_be_excluded.lower() in proficiencies_lower_to_original_map.keys()):
-                drop_columns_from_map(df_proficiencies, proficiencies_lower_to_original_map,
+                df_proficiencies = drop_columns_from_map(df_proficiencies, proficiencies_lower_to_original_map,
                                       to_be_excluded.lower())
             elif not ignore_case and (to_be_excluded in df_proficiencies.columns):
                 df_proficiencies.drop(to_be_excluded, axis=1, inplace=True)
@@ -146,9 +150,10 @@ class LanguagesRankingExtractor(LanguagesStatsExtractor):
         s_proficiencies_clean_sum: pd.Series = df_proficiencies.sum(axis=0, numeric_only=True)
 
         # sorting values by popularity
-        s_proficiencies_clean_sum.sort_values(ascending=ascending, inplace=True)
+        self.__language_proficiency_ranking = s_proficiencies_clean_sum.sort_values(ascending=ascending)
+        # s_proficiencies_clean_sum.sort_values(ascending=ascending, inplace=True)
 
-        return s_proficiencies_clean_sum
+        return self.__language_proficiency_ranking
 
     def merge_entries(self, df_proficiencies: pd.DataFrame, entries_merge_list: list) -> None:
         """
@@ -172,8 +177,11 @@ class LanguagesRankingExtractor(LanguagesStatsExtractor):
         This method returns a dictionary holding two values: full ranking and top ten languages from input dataframe
         :return: a dictionary holding two values: full ranking and top ten languages from input dataframe.
         """
-        return {'full ranking': self.compute_language_proficiency_ranking(),
-                'top ten': self.compute_top_ten_languages()}
+        if self.__language_proficiency_ranking is None:
+            self.compute_language_proficiency_ranking()
+        if self.__top_ten_languages is None:
+            self.compute_top_ten_languages()
+        return {'full ranking': self.__language_proficiency_ranking, 'top ten languages': self.__top_ten_languages}
 
     def get_data_source(self):
         return self.__source_data
