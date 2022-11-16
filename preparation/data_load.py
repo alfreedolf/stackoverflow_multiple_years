@@ -29,7 +29,7 @@ def load_surveys_data_from_csv(years=None, data_path="data", encoding="ISO-8859-
     if years is None:
         years = [2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021]
 
-    # dictionary containing years dat
+    # dictionary containing years data
     surveys_years_df = {}
     # retrieving base directory where data folder is expected to be located 
     base_dir = os.getcwd()
@@ -103,16 +103,20 @@ def merge_dataframes(data_frames_dict):
     return merged_df
 
 
-def get_10most_popular_languages_by_year(languages_popularity_df, proficiencies_by_year_data, top10languages):
+def get_10most_popular_languages_by_year(languages_popularity_df: pd.DataFrame, proficiencies_by_year_data: dict, top10languages: list):
     import re
     for year, dataset in proficiencies_by_year_data.items():
         # retrieving data of the first 10 popular languages
         for lang in top10languages:
             lang_re = r'\b' + re.escape(lang) + r'\Z'
-            tmp = dataset.filter(regex=lang_re)
-            if len(tmp) > 0:
-                languages_popularity_df.loc[year, lang] = int(tmp.values[0])
-
+            tmp_stats = dataset["full ranking"].filter(regex=lang_re)
+            if len(tmp_stats) > 0:
+                languages_popularity_df.loc[year, lang] = int(tmp_stats.values[0])
             else:
                 languages_popularity_df.loc[year, lang] = 0
-            del tmp
+            tmp_percentages = dataset["proficiency percentages"].filter(regex=lang_re)
+            if len(tmp_percentages) > 0:
+                languages_popularity_df.loc[year, lang+"_percentage"] = int(tmp_percentages.values[0])
+            else:
+                languages_popularity_df.loc[year, lang+"_percentage"] = 0
+            del tmp_stats, tmp_percentages
