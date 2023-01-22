@@ -6,3 +6,4 @@ data/*
 .idea/*
 notebooks/.ipynb_checkpoints/
 *.code-workspace
+*.pyc
