@@ -291,7 +291,7 @@ def df_2015_survey_preprocessing(df_surveys_15_in, lang_proficiencies_columns_ra
 
 def drop_first_row(df_list, range_start, range_end):
     for y in range(range_start, range_end + 1):
-        df_list[y].drop(axis=0, index=0, inplace=True)
+        df_list[y].drop(axis=0, index=df_list[y].index[0], inplace=True)
 
 
 # TODO use this function instead of dropping every single occurence of non-language features
