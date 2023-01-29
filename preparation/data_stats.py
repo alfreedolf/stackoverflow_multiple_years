@@ -251,5 +251,4 @@ class LanguagesProficienciesPercentages(LanguagesStatsExtractor):
 
         difference = (difference_count / total_respondents_count) * 100
         return difference
-# df_surveys_20[(df_surveys_20["LanguageWorkedWith: Java"] != 0) & (df_surveys_20["LanguageWorkedWith: Kotlin"] != 0)]
 
