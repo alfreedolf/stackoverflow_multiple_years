@@ -183,8 +183,12 @@ class LanguagesRankingExtractor(LanguagesStatsExtractor):
             self.compute_top_ten_languages()
         return {'full ranking': self.__language_proficiency_ranking, 'top ten languages': self.__top_ten_languages}
 
+    
     def get_data_source(self):
         return self.__source_data
+
+    
+    
 
 
 class LanguagesProficienciesPercentages(LanguagesStatsExtractor):
@@ -222,3 +226,30 @@ class LanguagesProficienciesPercentages(LanguagesStatsExtractor):
         return {'number respondents': self.get_data_source().shape[1],
                 'proficiency percentages': self.get_percentages(),
                 'top ten proficiency percentages': self.get_top_ten_percentages()}
+    
+    def intersection_percentage(self, language_1: str, language_2: str) -> float:
+        """
+        This function computes and returns the cardinality of the intersection set of respondents that have declared to have worked with language_1 also have declared to have been working in language_2.
+        
+        :return: overlap cardinality, in percentage
+        """
+        
+        total_respondents_count = self.__lre.get_data_source().shape[0]
+        
+        overlap_count = (self.__lre.get_data_source()[(self.__lre.get_data_source()[language_1] != 0)  &  (self.__lre.get_data_source()[language_2] != 0)].shape[0])
+        overlap = (overlap_count / total_respondents_count) * 100
+        return overlap
+
+    def difference_percentage(self, language_1: str, language_2: str) -> float:
+        """
+        This function computes and returns the cardinality of the differnce set of respondents that have declared to have worked with language_1 that have declared to have not been working in language_2.
+        
+        :return: difference cardinality, in percentage
+        """
+        total_respondents_count = self.__lre.get_data_source().shape[0]
+        difference_count = (self.__lre.get_data_source()[(self.__lre.get_data_source()[language_1] != 0)  &  (self.__lre.get_data_source()[language_2] == 0)].shape[0])
+
+        difference = (difference_count / total_respondents_count) * 100
+        return difference
+# df_surveys_20[(df_surveys_20["LanguageWorkedWith: Java"] != 0) & (df_surveys_20["LanguageWorkedWith: Kotlin"] != 0)]
+
