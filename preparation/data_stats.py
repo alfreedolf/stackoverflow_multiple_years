@@ -189,7 +189,13 @@ class LanguagesRankingExtractor(LanguagesStatsExtractor):
 
     
     
+from enum import Enum
 
+class PercentageJoin(Enum):
+    INNER_OVERALL = 0
+    LEFT_PARTIAL = 1
+    RIGHT_PARTIAL = 2
+    OUTER_PARTIAL = 3
 
 class LanguagesProficienciesPercentages(LanguagesStatsExtractor):
     """
@@ -227,7 +233,7 @@ class LanguagesProficienciesPercentages(LanguagesStatsExtractor):
                 'proficiency percentages': self.get_percentages(),
                 'top ten proficiency percentages': self.get_top_ten_percentages()}
     
-    def intersection_percentage(self, language_1: str, language_2: str, overall: bool=False) -> float:
+    def intersection_percentage(self, language_A: str, language_B: str, join_like: PercentageJoin=PercentageJoin.INNER_OVERALL) -> float:
         """
         This function computes and returns the cardinality of the intersection set of respondents that have declared to have worked with language_1 also have declared to have been working in language_2.
         :param: overall if true, the intersection percentage will be co returned with respect to the full population of respondents, otherwise, respect to language_1 population
@@ -235,13 +241,17 @@ class LanguagesProficienciesPercentages(LanguagesStatsExtractor):
         :return: overlap cardinality, in percentage
         """
         
-        if overall:
+        # TODO: fix this snippet, it should be generalized!
+        if join_like == PercentageJoin.INNER_OVERALL:
             respondents_count = self.__lre.get_data_source().shape[0]
-        else:
-            respondents_count = self.__lre.get_data_source()[self.__lre.get_data_source()[language_1] != 0].shape[0] 
-            
+        elif join_like == PercentageJoin.LEFT_PARTIAL:
+            respondents_count = self.__lre.get_data_source()[self.__lre.get_data_source()[language_A] != 0].shape[0] 
+        elif join_like == PercentageJoin.RIGHT_PARTIAL:
+            respondents_count = self.__lre.get_data_source()[self.__lre.get_data_source()[language_B] != 0].shape[0] 
         
-        overlap_count = (self.__lre.get_data_source()[(self.__lre.get_data_source()[language_1] != 0)  &  (self.__lre.get_data_source()[language_2] != 0)].shape[0])
+
+        
+        overlap_count = (self.__lre.get_data_source()[(self.__lre.get_data_source()[language_A] != 0)  &  (self.__lre.get_data_source()[language_B] != 0)].shape[0])
 
         overlap = (overlap_count / respondents_count) * 100
         return overlap
@@ -261,4 +271,7 @@ class LanguagesProficienciesPercentages(LanguagesStatsExtractor):
 
         difference = (difference_count / respondents_count) * 100
         return difference
+
+    def percentage_count(self, language: str):
+
 
