@@ -1,3 +1,4 @@
+"""This module contains statistics on data."""
 from abc import ABC, abstractmethod
 from collections import defaultdict
 
@@ -6,9 +7,9 @@ from pandas import DataFrame
 
 
 def map_any_case_to_lower(any_case_input: list) -> dict:
-    """
-    This function maps a list of strings values, given as input in any case combination,
-    to a lower case corresponding key. The result is a hash map in which each element has as key a lowercase string and
+    """Map a list of strings values, given as input in any kind of casing combination, to a lower case corresponding key.
+    
+    The result is a hash map in which each element has as key a lowercase string and
     as values a list of corresponding strings in any case combination.
     :param any_case_input: a list of any case combination list
     :return: a dictionary containing a list of strings corresponding to the key
@@ -229,20 +230,24 @@ class LanguagesProficienciesPercentages(LanguagesStatsExtractor):
                 'top ten proficiency percentages': self.get_top_ten_percentages()}
 
     
-    def share_percentage_weight(self, language_1: str, language_2: str, difference_set: bool=False, overall:bool=False) -> float:
-        """Compute percentage weight of language_1 portion in the union set language_1 + language_2.
+    def share_percentage_weight(self, language_1: str, language_2: str, tech_stack: str=None, difference_set: bool=False, overall:bool=False) -> float:
+        """Compute percentage weight of language_1 portion in the union set language_1 + language_2, with the option to include a tech stack as a third condition in the clause.
 
         :return: share percentage weight
         """
+        if tech_stack is None:
+            third_condition = True
+        else:
+            third_condition = (self.__lre.get_data_source()["PlatformWorkedWith"] == tech_stack)
         if overall:
             base_count = self.__lre.get_data_source().shape[0]
         else:
-            base_count = self.__lre.get_data_source()[(self.__lre.get_data_source()[language_1] != 0)  |  (self.__lre.get_data_source()[language_2] != 0)].shape[0]
+            base_count = self.__lre.get_data_source()[(self.__lre.get_data_source()[language_1] != 0)  |  (self.__lre.get_data_source()[language_2] != 0) & third_condition].shape[0]
 
         if difference_set:
-            quote_count = self.__lre.get_data_source()[(self.__lre.get_data_source()[language_1] != 0) & (self.__lre.get_data_source()[language_2] == 0)].shape[0]
+            quote_count = self.__lre.get_data_source()[(self.__lre.get_data_source()[language_1] != 0) & (self.__lre.get_data_source()[language_2] == 0) & third_condition].shape[0]
         else:
-            quote_count = self.__lre.get_data_source()[(self.__lre.get_data_source()[language_1] != 0)].shape[0]
+            quote_count = self.__lre.get_data_source()[(self.__lre.get_data_source()[language_1] != 0) & third_condition].shape[0]
 
         return (quote_count/base_count) * 100
     
