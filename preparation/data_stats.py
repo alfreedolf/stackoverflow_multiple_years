@@ -230,9 +230,9 @@ class LanguagesProficienciesPercentages(LanguagesStatsExtractor):
                 'top ten proficiency percentages': self.get_top_ten_percentages()}
 
     
-    def share_percentage_weight(self, language_1: str, language_2: str, tech_stack: str=None, difference_set: bool=False, overall:bool=False) -> float:
-        """Compute percentage weight of language_1 portion in the union set language_1 + language_2, with the option to include a tech stack as a third condition in the clause.
-
+    def percentage_cardinality(self, language_1: str, language_2: str=None, tech_stack: str=None, difference_set: bool=False, overall:bool=False) -> float:
+        """Compute cardinality of language_1 portion in the union set language_1 + language_2, with the option to include a tech stack as a third condition in the clause.
+        # TODO: generalize
         :return: share percentage weight
         """
         if tech_stack is None:
@@ -244,10 +244,12 @@ class LanguagesProficienciesPercentages(LanguagesStatsExtractor):
         else:
             base_count = self.__lre.get_data_source()[(self.__lre.get_data_source()[language_1] != 0)  |  (self.__lre.get_data_source()[language_2] != 0) & third_condition].shape[0]
 
-        if difference_set:
+        if difference_set and language_2 is not None:
             quote_count = self.__lre.get_data_source()[(self.__lre.get_data_source()[language_1] != 0) & (self.__lre.get_data_source()[language_2] == 0) & third_condition].shape[0]
-        else:
+        elif tech_stack is not None:
             quote_count = self.__lre.get_data_source()[(self.__lre.get_data_source()[language_1] != 0) & third_condition].shape[0]
+    
+            
 
         return (quote_count/base_count) * 100
     
