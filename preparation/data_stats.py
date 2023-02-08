@@ -230,29 +230,39 @@ class LanguagesProficienciesPercentages(LanguagesStatsExtractor):
                 'top ten proficiency percentages': self.get_top_ten_percentages()}
 
     
-    def percentage_cardinality(self, language_1: str, language_2: str=None, tech_stack: str=None, difference_set: bool=False, overall:bool=False) -> float:
-        """Compute cardinality of language_1 portion in the union set language_1 + language_2, with the option to include a tech stack as a third condition in the clause.
-        # TODO: generalize
-        :return: share percentage weight
+    def joint_percentage_share_on_platform(self, languages: list[], platform: str=None) -> float:
+        """Compute languages experience joint share on a platform.
+        
+        In case platform is set to None, the share is computed over the whole population.
+        :return: share percentage of the languges
         """
-        if tech_stack is None:
-            third_condition = True
+        if platform is None:
+            population_size = self.__lre.get_data_source().shape[0]
         else:
-            third_condition = (self.__lre.get_data_source()["PlatformWorkedWith"] == tech_stack)
-        if overall:
-            base_count = self.__lre.get_data_source().shape[0]
+            population_size = self.__lre.get_data_source()[self.__lre.get_data_source()["PlatformWorkedWith"] == platform].shape[0]
+        
+        share_sum = 0
+        for l in languages:
+            share_sum += self.__lre.get_data_source()[(self.__lre.get_data_source()[l] != 0) & self.__lre.get_data_source()["PlatformWorkedWith"] == platform].shape[0]
+
+        return (share_sum/population_size) * 100
+    
+    def exclusive_percentage_share_on_platform(self, languages: list[], platform: str=None) -> float:
+        """Compute languages experience joint share on a platform.
+        # TODO: evolve and complete
+        In case platform is set to None, the share is computed over the whole population.
+        :return: share percentage of the languges
+        """
+        if platform is None:
+            population_size = self.__lre.get_data_source().shape[0]
         else:
-            base_count = self.__lre.get_data_source()[(self.__lre.get_data_source()[language_1] != 0)  |  (self.__lre.get_data_source()[language_2] != 0) & third_condition].shape[0]
+            population_size = self.__lre.get_data_source()[self.__lre.get_data_source()["PlatformWorkedWith"] == platform].shape[0]
+        
+        share_sum = 0
+        for l in languages:
+            share_sum += self.__lre.get_data_source()[(self.__lre.get_data_source()[l] != 0) & self.__lre.get_data_source()["PlatformWorkedWith"] == platform].shape[0]
 
-        if difference_set and language_2 is not None:
-            quote_count = self.__lre.get_data_source()[(self.__lre.get_data_source()[language_1] != 0) & (self.__lre.get_data_source()[language_2] == 0) & third_condition].shape[0]
-        elif tech_stack is not None:
-            quote_count = self.__lre.get_data_source()[(self.__lre.get_data_source()[language_1] != 0) & third_condition].shape[0]
-    
-            
-
-        return (quote_count/base_count) * 100
-    
+        return (share_sum/population_size) * 100
     def intersection_percentage(self, language_1: str, language_2: str, overall: bool=False) -> float:
         """Compute and return cardinality of the intersection set of respondents that have declared to have worked with language_1 also have declared to have been working in language_2.
 
