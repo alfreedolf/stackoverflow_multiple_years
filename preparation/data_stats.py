@@ -230,39 +230,46 @@ class LanguagesProficienciesPercentages(LanguagesStatsExtractor):
                 'top ten proficiency percentages': self.get_top_ten_percentages()}
 
     
-    def joint_percentage_share_on_platform(self, languages: list[], platform: str=None) -> float:
+    def joint_percentage_share(self, languages: list, platform: str=None) -> float:
         """Compute languages experience joint share on a platform.
         
+        A percentage value that expresses the size of the languages list share on a selected platform is
         In case platform is set to None, the share is computed over the whole population.
         :return: share percentage of the languges
         """
         if platform is None:
+            platform_condition = True
             population_size = self.__lre.get_data_source().shape[0]
         else:
-            population_size = self.__lre.get_data_source()[self.__lre.get_data_source()["PlatformWorkedWith"] == platform].shape[0]
+            platform_condition = self.__lre.get_data_source()["PlatformWorkedWith"] == platform
+            population_size = self.__lre.get_data_source()[platform_condition].shape[0]
         
-        share_sum = 0
-        for l in languages:
-            share_sum += self.__lre.get_data_source()[(self.__lre.get_data_source()[l] != 0) & self.__lre.get_data_source()["PlatformWorkedWith"] == platform].shape[0]
+        # share_sum = 0
+        # for l in languages:
+        share_sum = self.__lre.get_data_source()[((self.__lre.get_data_source()[languages] !=0).any(axis=1)) & platform_condition].shape[0]
 
         return (share_sum/population_size) * 100
     
-    def exclusive_percentage_share_on_platform(self, languages: list[], platform: str=None) -> float:
-        """Compute languages experience joint share on a platform.
-        # TODO: evolve and complete
+    def exclusive_percentage_share(self, ref_language: str, excluded_languages: list, platform: str=None) -> float:
+        """Compute languages experience share of a language, subtracting shares of a list of languages.
+        
         In case platform is set to None, the share is computed over the whole population.
+
         :return: share percentage of the languges
         """
         if platform is None:
+            platform_condition = True
             population_size = self.__lre.get_data_source().shape[0]
         else:
-            population_size = self.__lre.get_data_source()[self.__lre.get_data_source()["PlatformWorkedWith"] == platform].shape[0]
+            platform_condition = self.__lre.get_data_source()["PlatformWorkedWith"] == platform
+            population_size = self.__lre.get_data_source()[platform_condition].shape[0]
         
-        share_sum = 0
-        for l in languages:
-            share_sum += self.__lre.get_data_source()[(self.__lre.get_data_source()[l] != 0) & self.__lre.get_data_source()["PlatformWorkedWith"] == platform].shape[0]
+        ref_share = self.__lre.get_data_source()[(self.__lre.get_data_source()[ref_language] != 0) & platform_condition].shape[0]
+        for l in excluded_languages:
+            ref_share -= self.__lre.get_data_source()[(self.__lre.get_data_source()[l] != 0) & self.__lre.get_data_source()["PlatformWorkedWith"] == platform].shape[0]
 
-        return (share_sum/population_size) * 100
+        return (ref_share/population_size) * 100
+
     def intersection_percentage(self, language_1: str, language_2: str, overall: bool=False) -> float:
         """Compute and return cardinality of the intersection set of respondents that have declared to have worked with language_1 also have declared to have been working in language_2.
 
