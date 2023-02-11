@@ -230,8 +230,8 @@ class LanguagesProficienciesPercentages(LanguagesStatsExtractor):
                 'top ten proficiency percentages': self.get_top_ten_percentages()}
 
     
-    def platform_shares(self, platform: str, language_feature_name_pattern: str="LanguageWorkedWith") -> list:
-        """Compute percentages share of languages on a specified platform
+    def platform_shares(self, platform: str, language_feature_name_pattern: str="^LanguageWorkedWith.*") -> pd.Series:
+        """Compute percentages share of languages on a specified platform.
 
         Args:
             platform (str): name of the platform (operating system or similar) used as reference for computing percentages
@@ -240,16 +240,21 @@ class LanguagesProficienciesPercentages(LanguagesStatsExtractor):
         Returns:
             list: list of share of languages with reference to the platform
         """
-        # TODO: implement
-        pass
+        # TODO: check if meaningful
+        
+        # languages used on the platform
+        platform_condition = self.__lre.get_data_source()["PlatformWorkedWith"] == platform
+        # languages from datasource
+        df_languages_filtered = self.__lre.get_data_source().filter(regex=language_feature_name_pattern, axis=1)
+        df_languages_shares = df_languages_filtered[df_languages_filtered.eq(1).any(axis=1) & platform_condition]
+        # sum on columns
+        # computing total proficiencies
+        s_proficiencies_clean_sum: pd.Series = df_languages_shares.sum(axis=0, numeric_only=True)
+        languages_proficiency_on_platform_ranking = s_proficiencies_clean_sum.sort_values(ascending=False)
+
+        return languages_proficiency_on_platform_ranking
 
     def joint_share(self, languages: list, unison: bool=False, platform: str=None) -> float:
-        """
-        
-        A percentage value that expresses the size of the languages list share on a selected platform is
-        In case platform is set to None, the share is computed over the whole population.
-        :return: share percentage of the languges
-        """
         """Compute languages experience joint share with reference to a platform.
 
         A percentage value that expresses the size of the languages list share on a selected platform is
