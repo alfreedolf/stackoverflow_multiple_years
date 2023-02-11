@@ -230,12 +230,38 @@ class LanguagesProficienciesPercentages(LanguagesStatsExtractor):
                 'top ten proficiency percentages': self.get_top_ten_percentages()}
 
     
-    def joint_percentage_share(self, languages: list, platform: str=None) -> float:
-        """Compute languages experience joint share on a platform.
+    def platform_shares(self, platform: str, language_feature_name_pattern: str="LanguageWorkedWith") -> list:
+        """Compute percentages share of languages on a specified platform
+
+        Args:
+            platform (str): name of the platform (operating system or similar) used as reference for computing percentages
+            language_feature_name_pattern (str, optional): _description_. Defaults to "LanguageWorkedWith".
+
+        Returns:
+            list: list of share of languages with reference to the platform
+        """
+        # TODO: implement
+        pass
+
+    def joint_share(self, languages: list, unison: bool=False, platform: str=None) -> float:
+        """
         
         A percentage value that expresses the size of the languages list share on a selected platform is
         In case platform is set to None, the share is computed over the whole population.
         :return: share percentage of the languges
+        """
+        """Compute languages experience joint share with reference to a platform.
+
+        A percentage value that expresses the size of the languages list share on a selected platform is
+        In case platform is set to None, the share is computed over the whole population.
+
+        Args:
+            languages (list): list of languages considered in the share computation
+            unison (bool, optional): If true, will indi. Defaults to False.
+            platform (str, optional): _description_. Defaults to None.
+
+        Returns:
+            float: share percentage of the languges
         """
         if platform is None:
             platform_condition = True
@@ -244,13 +270,14 @@ class LanguagesProficienciesPercentages(LanguagesStatsExtractor):
             platform_condition = self.__lre.get_data_source()["PlatformWorkedWith"] == platform
             population_size = self.__lre.get_data_source()[platform_condition].shape[0]
         
-        # share_sum = 0
-        # for l in languages:
-        share_sum = self.__lre.get_data_source()[((self.__lre.get_data_source()[languages] !=0).any(axis=1)) & platform_condition].shape[0]
+        if unison:
+            share_sum = self.__lre.get_data_source()[((self.__lre.get_data_source()[languages] !=0).all(axis=1)) & platform_condition].shape[0]
+        else:
+            share_sum = self.__lre.get_data_source()[((self.__lre.get_data_source()[languages] !=0).any(axis=1)) & platform_condition].shape[0]
 
         return (share_sum/population_size) * 100
     
-    def exclusive_percentage_share(self, ref_language: str, excluded_languages: list, platform: str=None) -> float:
+    def exclusive_share(self, ref_language: str, excluded_languages: list, platform: str=None) -> float:
         """Compute languages experience share of a language, subtracting shares of a list of languages.
         
         In case platform is set to None, the share is computed over the whole population.
@@ -264,9 +291,9 @@ class LanguagesProficienciesPercentages(LanguagesStatsExtractor):
             platform_condition = self.__lre.get_data_source()["PlatformWorkedWith"] == platform
             population_size = self.__lre.get_data_source()[platform_condition].shape[0]
         
-        ref_share = self.__lre.get_data_source()[(self.__lre.get_data_source()[ref_language] != 0) & platform_condition].shape[0]
-        for l in excluded_languages:
-            ref_share -= self.__lre.get_data_source()[(self.__lre.get_data_source()[l] != 0) & self.__lre.get_data_source()["PlatformWorkedWith"] == platform].shape[0]
+        reference_language_mask = self.__lre.get_data_source()[ref_language] != 0
+
+        ref_share = self.__lre.get_data_source()[reference_language_mask & (self.__lre.get_data_source()[excluded_languages] == 0).all(axis=1) & platform_condition].shape[0]
 
         return (ref_share/population_size) * 100
 
