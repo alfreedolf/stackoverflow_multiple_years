@@ -240,7 +240,7 @@ class LanguagesProficienciesPercentages(LanguagesStatsExtractor):
         Returns:
             list: list of share of languages with reference to the platform
         """
-        # TODO: check if meaningful
+        # TODO: check if meaningful, otherwise delete it
         
         # languages used on the platform
         platform_condition = self.__lre.get_data_source()["PlatformWorkedWith"] == platform
