@@ -109,12 +109,12 @@ def get_10most_popular_languages_by_year(languages_popularity_df: pd.DataFrame, 
         # retrieving data of the first 10 popular languages
         for lang in top10languages:
             lang_re = r'\b' + re.escape(lang) + r'\Z'
-            tmp_stats = dataset["full ranking"].filter(regex=lang_re)
+            tmp_stats = dataset[0]["full ranking"].filter(regex=lang_re)
             if len(tmp_stats) > 0:
                 languages_popularity_df.loc[year, lang] = int(tmp_stats.values[0])
             else:
                 languages_popularity_df.loc[year, lang] = 0
-            tmp_percentages = dataset["proficiency percentages"].filter(regex=lang_re)
+            tmp_percentages = dataset[1]["proficiency percentages"].filter(regex=lang_re)
             if len(tmp_percentages) > 0:
                 languages_popularity_df.loc[year, lang+"_percentage"] = int(tmp_percentages.values[0])
             else:
