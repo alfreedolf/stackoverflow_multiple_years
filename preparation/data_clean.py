@@ -26,7 +26,7 @@ def clean_data(input_dataframe, target_feature: str):
         target_feature: (str) target feature to be cleaned
 
     Returns:
-        input_features: (pandas.DataFrame) matrix containing meaninful variables
+        input_features: (pandas.DataFrame) matrix of meaninful features
         target_label: (pandas.DataFrame) corresponding answer vector
     """
     # Drop rows with missing target_feature values

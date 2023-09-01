@@ -27,7 +27,7 @@ def load_surveys_data_from_csv(years=None, data_path="data", encoding="ISO-8859-
     :return: a dictionary of dataframes containing raw data from surveys from multiple years
     """
     if years is None:
-        years = [2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021]
+        years = [2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023]
 
     # dictionary containing years data
     surveys_years_df = {}
@@ -36,7 +36,8 @@ def load_surveys_data_from_csv(years=None, data_path="data", encoding="ISO-8859-
     # base_dir = os.path.split(os.getcwd())[0]
     for y in years:
         surveys_years_df[y] = load_from_csv(os.path.join(base_dir, data_path,
-                                                         '{}_results.csv'.format(y)), encoding)
+                                                         f"{y}_results.csv"),
+                                                         encoding)
     return surveys_years_df
 
 
