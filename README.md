@@ -31,6 +31,7 @@ listed questions):
 
 1. [What languages were the most popular in each year?](notebooks/1.LanguagesPopularityByYear.ipynb)
 2. [What trends are in top 10 languages popularity?](notebooks/2.Top10LanguagesPopularityTrends.ipynb)
+3. [Referring specifically to Android paltform, are there any visible shifts in languages popularity between two or more of the top ten languages over the years?](notebooks/3.AndroidPlatformLaguagesInDepthAnalysis.ipynb)
 3. Does the country of origin influence the preferred/mostly used language?
 4. Does the amount of years in programming influence the preferred/most used programming language?
 
