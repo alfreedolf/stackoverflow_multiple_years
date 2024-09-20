@@ -141,7 +141,7 @@ class LanguagesRankingExtractor(LanguagesStatsExtractor):
             elif not ignore_case and (to_be_excluded in df_proficiencies.columns):
                 df_proficiencies.drop(to_be_excluded, axis=1, inplace=True)
             else:
-                print("error finding feature in axis")
+                print(f"Error finding feature '{to_be_excluded}' in axis")
 
         # merging entries from entries_merge_list, if not empty
         if self.__entries_merge_list:
