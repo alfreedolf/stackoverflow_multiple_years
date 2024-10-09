@@ -254,7 +254,8 @@ class LanguagesProficienciesPercentages(LanguagesStatsExtractor):
 
         return languages_proficiency_on_platform_ranking
 
-    def joint_share(self, languages: list, unison: bool=False, platform: str=None) -> float:
+    def joint_share(self, languages: list, unison: bool=False,
+                    platform_key: str="PlatformWorkedWith", platform: str=None) -> float:
         """Compute languages experience joint share with reference to a platform.
 
         A percentage value that expresses the size of the languages list share on a selected platform is
@@ -272,7 +273,7 @@ class LanguagesProficienciesPercentages(LanguagesStatsExtractor):
             platform_condition = True
             population_size = self.__lre.get_data_source().shape[0]
         else:
-            platform_condition = self.__lre.get_data_source()["PlatformWorkedWith"] == platform
+            platform_condition = self.__lre.get_data_source()[platform_key] == platform
             population_size = self.__lre.get_data_source()[platform_condition].shape[0]
         
         if unison:
