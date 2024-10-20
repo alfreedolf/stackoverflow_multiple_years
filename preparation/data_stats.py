@@ -1,3 +1,4 @@
+"""This module contains statistics on data."""
 from abc import ABC, abstractmethod
 from collections import defaultdict
 
@@ -6,9 +7,9 @@ from pandas import DataFrame
 
 
 def map_any_case_to_lower(any_case_input: list) -> dict:
-    """
-    This function maps a list of strings values, given as input in any case combination,
-    to a lower case corresponding key. The result is a hash map in which each element has as key a lowercase string and
+    """Map a list of strings values, given as input in any kind of casing combination, to a lower case corresponding key.
+    
+    The result is a hash map in which each element has as key a lowercase string and
     as values a list of corresponding strings in any case combination.
     :param any_case_input: a list of any case combination list
     :return: a dictionary containing a list of strings corresponding to the key
@@ -140,7 +141,7 @@ class LanguagesRankingExtractor(LanguagesStatsExtractor):
             elif not ignore_case and (to_be_excluded in df_proficiencies.columns):
                 df_proficiencies.drop(to_be_excluded, axis=1, inplace=True)
             else:
-                print("error finding feature in axis")
+                print(f"Error finding feature '{to_be_excluded}' in axis")
 
         # merging entries from entries_merge_list, if not empty
         if self.__entries_merge_list:
@@ -183,8 +184,12 @@ class LanguagesRankingExtractor(LanguagesStatsExtractor):
             self.compute_top_ten_languages()
         return {'full ranking': self.__language_proficiency_ranking, 'top ten languages': self.__top_ten_languages}
 
+    
     def get_data_source(self):
         return self.__source_data
+
+    
+    
 
 
 class LanguagesProficienciesPercentages(LanguagesStatsExtractor):
@@ -215,10 +220,119 @@ class LanguagesProficienciesPercentages(LanguagesStatsExtractor):
         return percentages
 
     def get_stats(self) -> dict:
-        """
-        This function returns both proficiency percentages
+        """Retrieve proficiency percentages.
+        
+        Description
         :return: number of respondents, proficiency percentages and top ten languages percentages
         """
         return {'number respondents': self.get_data_source().shape[1],
                 'proficiency percentages': self.get_percentages(),
                 'top ten proficiency percentages': self.get_top_ten_percentages()}
+
+    
+    def platform_shares(self, platform: str, language_feature_name_pattern: str="^LanguageWorkedWith.*") -> pd.Series:
+        """Compute percentages share of languages on a specified platform.
+
+        Args:
+            platform (str): name of the platform (operating system or similar) used as reference for computing percentages
+            language_feature_name_pattern (str, optional): _description_. Defaults to "LanguageWorkedWith".
+
+        Returns:
+            list: list of share of languages with reference to the platform
+        """
+        # TODO: check if meaningful, otherwise delete it
+        
+        # languages used on the platform
+        platform_condition = self.__lre.get_data_source()["PlatformWorkedWith"] == platform
+        # languages from datasource
+        df_languages_filtered = self.__lre.get_data_source().filter(regex=language_feature_name_pattern, axis=1)
+        df_languages_shares = df_languages_filtered[df_languages_filtered.eq(1).any(axis=1) & platform_condition]
+        # sum on columns
+        # computing total proficiencies
+        s_proficiencies_clean_sum: pd.Series = df_languages_shares.sum(axis=0, numeric_only=True)
+        languages_proficiency_on_platform_ranking = s_proficiencies_clean_sum.sort_values(ascending=False)
+
+        return languages_proficiency_on_platform_ranking
+
+    def joint_share(self, languages: list, unison: bool=False,
+                    platform_key: str="PlatformWorkedWith", platform: str=None) -> float:
+        """Compute languages experience joint share with reference to a platform.
+
+        A percentage value that expresses the size of the languages list share on a selected platform is
+        In case platform is set to None, the share is computed over the whole population.
+
+        Args:
+            languages (list): list of languages considered in the share computation
+            unison (bool, optional): If true, will indi. Defaults to False.
+            platform (str, optional): _description_. Defaults to None.
+
+        Returns:
+            float: share percentage of the languges
+        """
+        if platform is None:
+            platform_condition = True
+            population_size = self.__lre.get_data_source().shape[0]
+        else:
+            platform_condition = self.__lre.get_data_source()[platform_key] == platform
+            population_size = self.__lre.get_data_source()[platform_condition].shape[0]
+        
+        if unison:
+            share_sum = self.__lre.get_data_source()[((self.__lre.get_data_source()[languages] !=0).all(axis=1)) & platform_condition].shape[0]
+        else:
+            share_sum = self.__lre.get_data_source()[((self.__lre.get_data_source()[languages] !=0).any(axis=1)) & platform_condition].shape[0]
+
+        return (share_sum/population_size) * 100
+    
+    def exclusive_share(self, ref_language: str, excluded_languages: list, platform: str=None) -> float:
+        """Compute languages experience share of a language, subtracting shares of a list of languages.
+        
+        In case platform is set to None, the share is computed over the whole population.
+
+        :return: share percentage of the languges
+        """
+        if platform is None:
+            platform_condition = True
+            population_size = self.__lre.get_data_source().shape[0]
+        else:
+            platform_condition = self.__lre.get_data_source()["PlatformWorkedWith"] == platform
+            population_size = self.__lre.get_data_source()[platform_condition].shape[0]
+        
+        reference_language_mask = self.__lre.get_data_source()[ref_language] != 0
+
+        ref_share = self.__lre.get_data_source()[reference_language_mask & (self.__lre.get_data_source()[excluded_languages] == 0).all(axis=1) & platform_condition].shape[0]
+
+        return (ref_share/population_size) * 100
+
+    def intersection_percentage(self, language_1: str, language_2: str, overall: bool=False) -> float:
+        """Compute and return cardinality of the intersection set of respondents that have declared to have worked with language_1 also have declared to have been working in language_2.
+
+        :param: overall if true, the intersection percentage will be co returned with respect to the full population of respondents, otherwise, respect to language_1 population
+        
+        :return: overlap cardinality, in percentage
+        """
+        if overall:
+            base_count = self.__lre.get_data_source().shape[0]
+        else:
+            base_count = self.__lre.get_data_source()[self.__lre.get_data_source()[language_1] != 0].shape[0] 
+            
+        
+        overlap_count = self.__lre.get_data_source()[(self.__lre.get_data_source()[language_1] != 0)  &  (self.__lre.get_data_source()[language_2] != 0)].shape[0]
+
+        overlap = (overlap_count / base_count) * 100
+        return overlap
+
+    def difference_percentage(self, language_1: str, language_2: str, union_relative: bool=False) -> float:
+        """Compute and returns the cardinality of the intersection set of respondents that have declared to have worked with language_1 also have declared to have been working in language_2.
+
+        :param: union_relative if true, the base to compute the percentage, will be the cardinality of union of language_1 and language_2 respondents, otherwise it will be language_1 population cardinality
+        """
+        if union_relative:
+            base_count = self.__lre.get_data_source()[(self.__lre.get_data_source()[language_1] != 0)  &  (self.__lre.get_data_source()[language_2] != 0)].shape[0]
+        else:
+            base_count = self.__lre.get_data_source()[self.__lre.get_data_source()[language_1] != 0].shape[0] 
+            
+        difference_count = (self.__lre.get_data_source()[(self.__lre.get_data_source()[language_1] != 0)  &  (self.__lre.get_data_source()[language_2] == 0)].shape[0])
+
+        difference = (difference_count / base_count) * 100
+        return difference
+

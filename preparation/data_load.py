@@ -27,7 +27,7 @@ def load_surveys_data_from_csv(years=None, data_path="data", encoding="ISO-8859-
     :return: a dictionary of dataframes containing raw data from surveys from multiple years
     """
     if years is None:
-        years = [2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021]
+        years = [2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024]
 
     # dictionary containing years data
     surveys_years_df = {}
@@ -36,7 +36,8 @@ def load_surveys_data_from_csv(years=None, data_path="data", encoding="ISO-8859-
     # base_dir = os.path.split(os.getcwd())[0]
     for y in years:
         surveys_years_df[y] = load_from_csv(os.path.join(base_dir, data_path,
-                                                         '{}_results.csv'.format(y)), encoding)
+                                                         f"{y}_results.csv"),
+                                                         encoding)
     return surveys_years_df
 
 
@@ -109,14 +110,14 @@ def get_10most_popular_languages_by_year(languages_popularity_df: pd.DataFrame, 
         # retrieving data of the first 10 popular languages
         for lang in top10languages:
             lang_re = r'\b' + re.escape(lang) + r'\Z'
-            tmp_stats = dataset["full ranking"].filter(regex=lang_re)
+            tmp_stats = dataset[0]["full ranking"].filter(regex=lang_re)
             if len(tmp_stats) > 0:
                 languages_popularity_df.loc[year, lang] = int(tmp_stats.values[0])
             else:
                 languages_popularity_df.loc[year, lang] = 0
-            tmp_percentages = dataset["proficiency percentages"].filter(regex=lang_re)
+            tmp_percentages = dataset[1]["proficiency percentages"].filter(regex=lang_re)
             if len(tmp_percentages) > 0:
-                languages_popularity_df.loc[year, lang+"_percentage"] = int(tmp_percentages.values[0])
+                languages_popularity_df.loc[year, lang+" percentage"] = tmp_percentages.values[0]
             else:
-                languages_popularity_df.loc[year, lang+"_percentage"] = 0
+                languages_popularity_df.loc[year, lang+" percentage"] = 0
             del tmp_stats, tmp_percentages

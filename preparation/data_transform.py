@@ -247,7 +247,7 @@ def optimized_column_split(input_df: pd.DataFrame, joint_column: pd.Series, sepa
         df_out = input_df
 
     # iterating over features rows to populate features set
-    for index, joint_features in joint_column.iteritems():
+    for index, joint_features in joint_column.items():
         if isinstance(joint_features, str):
             for feat in joint_features.split(sep=separator):
                 column_name = split_column_prefix + ": " + feat.strip()
