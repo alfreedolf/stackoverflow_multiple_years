@@ -16,10 +16,11 @@ The code should run with no issues using Python versions 3.* and libraries as in
 For this project, I was interested in using Stack Overflow data from multiple years, from 2011, to better understand some insights regarding the popularity of programming languages over time.
 Here are the questions that the project is currently covering:
 
-1. What languages were the most popular in each year?
-2. What trends are in top 10 languages popularity?
-3. Does the country of origin influence the preferred/mostly used language?
-4. Does the amount of years in programming influence the preferred/mostly used language?
+
+1. Which languages were the most popular each year?
+2. Did the Android platform experience visible shifts in language of choice over the years?
+3. What trends are in top 10 languages popularity?
+4. What is the influence of previous experience on present and future choices?
 
 ## File Descriptions <a name="files"></a>
 
@@ -30,15 +31,16 @@ Markdown cells were used to assist in walking through the thought process for in
 </br>Here follows the list of Jupyter Notebooks part of the analysis (each of them will give an answer to the above
 listed questions):
 
-1. [What languages were the most popular in each year?](notebooks/1.LanguagesPopularityByYear.ipynb)
-2. [Referring specifically to Android paltform, are there any visible shifts in languages popularity between two or more of the top ten languages over the years?](notebooks/2.AndroidPlatformLaguagesInDepthAnalysis.ipynb)
-3. [What trends are in top 10 languages popularity?](notebooks/3.Top10LanguagesPopularityTrends.ipynb)
-4. [What is the influence of previous experience on present and future choices](notebooks/4.ExperiencePreferenceRelation.ipynb)
+A notebook that presents the analysis and loads all the data, named
+[Analysis Presentation](notebooks/0.AnalysisPresentation.ipynb).
+
+
+1. + 2. [What languages were the most popular in each year? Referring specifically to Android paltform, are there any visible shifts in languages popularity between two or more of the top ten languages over the years?](notebooks/1.LanguagesPopularityByYear.ipynb)
+3. [What trends are in top 10 languages popularity?](notebooks/2.Top10LanguagesPopularityTrends.ipynb)
+4. [What is the influence of previous experience on present and future choices](notebooks/4.ExperiencePreferenceRelation.ipynb) [TBD]
     1. How the number of years in programming influence the preferred/mostly used language? This could be done using scatterplot or heatmaps... Mabye also have a look at Violin/Box Plots. Faceting? Adaptation of Univariate Plots? I can use the average of the years in programming on Y axis. This is qualitative (most used language) vs quantitative (number of years in programming)
     2. Does the developer's principal language(s) influence the desire to learn a specific language in the future? This could be done usign scatterplot too? Maybe it is better to explore correlation with other features too.
 
-In addition to above listed notebooks, a presentational notebook, containing also all data load operations, named
-[Analysis Presentation](notebooks/0.AnalysisPresentation.ipynb).
 
 Also, a set of python files where used as support for preparation (data load, transformation, etc.):
 
@@ -50,7 +52,7 @@ Also, a set of python files where used as support for preparation (data load, tr
 ## Results<a name="results"></a>
 
 As soon as the analysis will be ready, the main findings of the code will be found at the post
-available [here](https://medium.com/TBD).
+available [here](https://medium.com/@evoagent/trendy-languages-for-old-fashioned-programmers-fd3d3789b1a1).
 
 ## Licensing, Authors, Acknowledgements<a name="licensing"></a>
 
