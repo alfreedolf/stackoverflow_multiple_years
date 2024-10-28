@@ -5,8 +5,9 @@ import pandas as pd
 from pandas import DataFrame
 
 
-def transform_unnamed_cols_base(df: pd.DataFrame, base_column_name: str, columns_look_ahead: int,
-                                new_column_name_prefix: str = None, inplace=False) -> object:
+def transform_unnamed_cols_base(
+    df: pd.DataFrame, base_column_name: str, columns_look_ahead: int, new_column_name_prefix: str = None, inplace=False
+) -> object:
     """
     This function transforms a range of columns based assuming the presence of following schema in dataframe:
 
@@ -34,15 +35,18 @@ def transform_unnamed_cols_base(df: pd.DataFrame, base_column_name: str, columns
     """
 
     # extracting  columns of interest
-    df_target_columns = df.iloc[:, df.columns.get_loc(base_column_name): (df.columns.get_loc(base_column_name) +
-                                                                          columns_look_ahead)]
+    df_target_columns = df.iloc[
+        :, df.columns.get_loc(base_column_name) : (df.columns.get_loc(base_column_name) + columns_look_ahead)
+    ]
 
-    return _even_out_categorical_as_binaries(df, df_target_columns,
-                                             new_column_name_prefix=new_column_name_prefix, inplace=inplace)
+    return _even_out_categorical_as_binaries(
+        df, df_target_columns, new_column_name_prefix=new_column_name_prefix, inplace=inplace
+    )
 
 
-def transform_unnamed_cols_range(df: pd.DataFrame, columns_range: range,
-                                 new_column_name_prefix: str, inplace=False) -> object:
+def transform_unnamed_cols_range(
+    df: pd.DataFrame, columns_range: range, new_column_name_prefix: str, inplace=False
+) -> object:
     """
     This function transforms a range of columns based assuming the presence of following schema in dataframe:
 
@@ -71,12 +75,14 @@ def transform_unnamed_cols_range(df: pd.DataFrame, columns_range: range,
     # extracting  columns of interest
     df_target_columns = df.iloc[:, columns_range]
 
-    return _even_out_categorical_as_binaries(df, df_target_columns.columns,
-                                             new_column_name_prefix=new_column_name_prefix, inplace=inplace)
+    return _even_out_categorical_as_binaries(
+        df, df_target_columns.columns, new_column_name_prefix=new_column_name_prefix, inplace=inplace
+    )
 
 
-def _even_out_categorical_as_binaries(df: pd.DataFrame, df_target_columns: pd.DataFrame,
-                                      new_column_name_prefix: str, inplace: bool) -> object:
+def _even_out_categorical_as_binaries(
+    df: pd.DataFrame, df_target_columns: pd.DataFrame, new_column_name_prefix: str, inplace: bool
+) -> object:
     """
     This function will even out a range of columns containing string values into a range of binary values in [0,1]
     :param df: input dataframe
@@ -94,8 +100,9 @@ def _even_out_categorical_as_binaries(df: pd.DataFrame, df_target_columns: pd.Da
         return None
 
 
-def _categorical_columns_range_rename(df: pd.DataFrame, target_columns: pd.Index,
-                                      column_prefix_name: str, binary_output: bool = True) -> None:
+def _categorical_columns_range_rename(
+    df: pd.DataFrame, target_columns: pd.Index, column_prefix_name: str, binary_output: bool = True
+) -> None:
     """
     This function renames dataframe columns, from categorical data which are in the form
     :param df: input dataframe
@@ -138,8 +145,9 @@ def binarize_column(df: pd.DataFrame, col_name: str, true_val: str, inplace: boo
         return None
 
 
-def binarize_columns_range(df: pd.DataFrame, col_range: range, true_values: list,
-                           inplace: bool = True) -> Optional[DataFrame]:
+def binarize_columns_range(
+    df: pd.DataFrame, col_range: range, true_values: list, inplace: bool = True
+) -> Optional[DataFrame]:
     """
     Transforms a set of columns (a dataframe) to binary values
     :param df: input dataframe
@@ -170,8 +178,9 @@ def first_valid_value_index(column_name: str, column_data: pd.Series):
     return curr_valid_index
 
 
-def feature_split(df: pd.DataFrame,
-                  column_to_split: str, sep: str = ";", inplace: bool = True) -> Optional[pd.DataFrame]:
+def feature_split(
+    df: pd.DataFrame, column_to_split: str, sep: str = ";", inplace: bool = True
+) -> Optional[pd.DataFrame]:
     """
     This function splits data from a single column into a set of columns
     :rtype: object
@@ -200,8 +209,9 @@ def feature_split(df: pd.DataFrame,
         return None
 
 
-def column_split(input_df: pd.DataFrame, joint_column: pd.Series,
-                 separator: str, split_column_prefix: str, inplace: bool = True):
+def column_split(
+    input_df: pd.DataFrame, joint_column: pd.Series, separator: str, split_column_prefix: str, inplace: bool = True
+):
     """
     This function splits input dataframe column containing all the languages separated by a separator,
     into a set of columns containing a single language for each column.
@@ -228,8 +238,9 @@ def column_split(input_df: pd.DataFrame, joint_column: pd.Series,
     return df_out
 
 
-def optimized_column_split(input_df: pd.DataFrame, joint_column: pd.Series, separator: str, split_column_prefix: str,
-                           inplace: bool = True):
+def optimized_column_split(
+    input_df: pd.DataFrame, joint_column: pd.Series, separator: str, split_column_prefix: str, inplace: bool = True
+):
     """
     This function splits input dataframe column containing all the languages separated by a separator,
     into a set of columns containing a single language for each column.
@@ -275,17 +286,21 @@ def df_2015_survey_preprocessing(df_surveys_15_in, lang_proficiencies_columns_ra
     :param lang_proficiencies_columns_range_of_interest_2015:
     :return:
     """
-    tvi_list = [column_data.first_valid_index() - 1
-                for _, column_data in
-                df_surveys_15_in.iloc[:, lang_proficiencies_columns_range_of_interest_2015].iteritems()]
+    tvi_list = [
+        column_data.first_valid_index() - 1
+        for _, column_data in df_surveys_15_in.iloc[:, lang_proficiencies_columns_range_of_interest_2015].iteritems()
+    ]
     true_values_coordinates_results_2015 = zip(tvi_list, lang_proficiencies_columns_range_of_interest_2015)
 
     lang_and_tech_in_2015_true_values = []
     for row, col in true_values_coordinates_results_2015:
         lang_and_tech_in_2015_true_values.append(df_surveys_15_in.iat[row, col])
-    df_surveys_15_out = binarize_columns_range(df=df_surveys_15_in,
-                                               col_range=lang_proficiencies_columns_range_of_interest_2015,
-                                               true_values=lang_and_tech_in_2015_true_values, inplace=False)
+    df_surveys_15_out = binarize_columns_range(
+        df=df_surveys_15_in,
+        col_range=lang_proficiencies_columns_range_of_interest_2015,
+        true_values=lang_and_tech_in_2015_true_values,
+        inplace=False,
+    )
     return df_surveys_15_out
 
 
@@ -300,4 +315,4 @@ def find_colum_name(column_name, columns_list):
         # this uses a generator to find the index if it matches, will raise an exception if not found
         return columns_list[next(i for i, v in enumerate(columns_list) if v.lower() == column_name)]
     except:
-        return ''
+        return ""

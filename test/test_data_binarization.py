@@ -84,7 +84,11 @@ class TestBinarization(unittest.TestCase):
         df_binarized = self.results_2015_df.iloc[self.results_2015_fvi, self.results_2015_croi]
         self.assertTrue(
             _contains_binary_values_only(df_binarized),
-            msg=f"Binarizable values = {self.results_2015_df.iloc[:, self.results_2015_croi]}, \n True values = {self.results_2015_true_values}, \n binarized column = {df_binarized}",
+            msg=f"""
+            Binarizable values = {self.results_2015_df.iloc[:, self.results_2015_croi]}, \n
+            True values = {self.results_2015_true_values}, \n
+            binarized column = {df_binarized}"
+            """,
         )
 
     def test_binarize_column(self):

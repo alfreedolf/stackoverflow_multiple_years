@@ -1,3 +1,4 @@
+"""Utilities module"""
 from .data_clean import *
 from .data_load import *
 from .data_stats import *

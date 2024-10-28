@@ -2,7 +2,7 @@
 This file contains functions needed to load data from sources
 """
 import os
-
+import re
 import pandas as pd
 
 
@@ -104,8 +104,15 @@ def merge_dataframes(data_frames_dict):
     return merged_df
 
 
-def get_10most_popular_languages_by_year(languages_popularity_df: pd.DataFrame, proficiencies_by_year_data: dict, top10languages: list):
-    import re
+def get_10most_popular_languages_by_year(languages_popularity_df: pd.DataFrame,
+                                         proficiencies_by_year_data: dict[str, list], top10languages: list):
+    """Retrieve 10 most populare languages by year
+
+    Args:
+        languages_popularity_df (pd.DataFrame): input dataframe containing popularity data for languages
+        proficiencies_by_year_data (dict[str, list]): key-value year-proficiency data list 
+        top10languages (list): _description_
+    """
     for year, dataset in proficiencies_by_year_data.items():
         # retrieving data of the first 10 popular languages
         for lang in top10languages:
