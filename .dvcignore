@@ -4,6 +4,6 @@
 
 data/*.pdf
 data/serialized/*
-data/src/*.pdf
+data/src/**/*.pdf
 
 
