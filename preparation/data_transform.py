@@ -1,3 +1,5 @@
+"""Data transformation module
+"""
 import re
 from typing import Dict, Optional
 
@@ -169,7 +171,18 @@ def binarize_columns_range(
         return None
 
 
-def first_valid_value_index(column_name: str, column_data: pd.Series):
+def first_valid_value_index(column_name: str, column_data: pd.Series) -> int:
+    """Searches through a pandas.Series to find the index
+    of the first valid value that matches a specific condition related
+    to the column name.
+
+    Args:
+        column_name (str): string used to track the index
+        column_data (pd.Series): series data input
+
+    Returns:
+        int: index
+    """
     curr_valid_index = -1
     for i, val in column_data.iteritems():
         if isinstance(val, str):
@@ -305,12 +318,43 @@ def df_2015_survey_preprocessing(df_surveys_15_in, lang_proficiencies_columns_ra
 
 
 def drop_first_row(df_list, range_start, range_end):
+    """Drop the first row in each DataFrame within a specified range in a list.
+
+    Args:
+        df_list (list of pd.DataFrame): List of pandas DataFrames to modify.
+        range_start (int): Starting index of the range (inclusive).
+        range_end (int): Ending index of the range (inclusive).
+
+    Modifies:
+        Each DataFrame in `df_list` from index `range_start` to `range_end` (inclusive) 
+        by removing its first row.
+        
+    Example:
+        >>> df_list = [df1, df2, df3]
+        >>> drop_first_row(df_list, 0, 1)
+        The first row of df1 and df2 will be dropped.
+    """
     for y in range(range_start, range_end + 1):
         df_list[y].drop(axis=0, index=df_list[y].index[0], inplace=True)
 
 
 # TODO use this function instead of dropping every single occurence of non-language features
 def find_colum_name(column_name, columns_list):
+    """Find a column name in a list of columns, ignoring case.
+
+    Args:
+        column_name (str): The column name to search for (case-insensitive).
+        columns_list (list of str): List of column names to search within.
+
+    Returns:
+        str: The exact column name from `columns_list` if found (matching `column_name` case-insensitively),
+             otherwise an empty string.
+
+    Example:
+        >>> columns_list = ["Name", "Age", "Gender"]
+        >>> find_column_name("age", columns_list)
+        "Age"
+    """
     try:
         # this uses a generator to find the index if it matches, will raise an exception if not found
         return columns_list[next(i for i, v in enumerate(columns_list) if v.lower() == column_name)]

@@ -1,3 +1,5 @@
+"""Test on data stats
+"""
 from unittest import TestCase
 
 import numpy as np
@@ -51,7 +53,8 @@ class TestDropColumnsFromLowerCaseMap(TestCase):
 
 
 class TestLanguagesRankingExtractor(TestCase):
-
+    """Test Case on LanguageRankingExtractor
+    """
     def setUp(self) -> None:
         # input dataframe initialization
         # input index
@@ -130,15 +133,21 @@ class TestLanguagesRankingExtractor(TestCase):
             np.testing.assert_array_equal(top_ten_languages_df.values, self.s_expected_output.values)
 
     def test_compute_language_proficiency_ranking(self):
+        """Test on data proficinecy ranking computation 
+        """
         # TODO add test
         # language_proficiencies_ranking_df = self.lre.compute_language_proficiency_ranking()
         pass
 
     def test_get_stats(self):
+        """Test on get data stats 
+        """
         # TODO add test
         pass
 
     def test_merge_entries(self):
+        """Test on merge entries 
+        """
         # TODO add test
         self.lre.merge_entries(df_proficiencies=self.df_input, entries_merge_list=self.entries_merge_list)
         np.testing.assert_array_equal(self.df_input.columns, self.expected_output_columns_after_merge)

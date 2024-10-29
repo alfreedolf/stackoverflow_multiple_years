@@ -49,14 +49,26 @@ class LanguagesStatsExtractor(ABC):
 
     @abstractmethod
     def get_data_source(self) -> DataFrame:
+        """Retrieve data source
+
+        Returns:
+            DataFrame: data source
+        """
         return self.__source_data
 
     @abstractmethod
     def get_stats(self) -> dict:
+        """Get statistics
+
+        Returns:
+            dict: statistics
+        """
         pass
 
 
 class LanguagesRankingExtractor(LanguagesStatsExtractor):
+    """Extracts ranking of languages popularity
+    """
 
     def __init__(
         self,

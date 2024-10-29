@@ -1,3 +1,6 @@
+"""Test Data Binarization
+
+"""
 import os
 import unittest
 
@@ -47,6 +50,8 @@ def _contains_binary_values_only(df: pd.DataFrame):
 
 
 class TestBinarization(unittest.TestCase):
+    """Test case for binarization
+    """
 
     def setUp(self) -> None:
         """Setup function"""
