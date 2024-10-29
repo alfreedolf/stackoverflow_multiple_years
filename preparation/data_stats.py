@@ -193,7 +193,12 @@ class LanguagesRankingExtractor(LanguagesStatsExtractor):
             self.compute_top_ten_languages()
         return {"full ranking": self.__language_proficiency_ranking, "top ten languages": self.__top_ten_languages}
 
-    def get_data_source(self):
+    def get_data_source(self) -> pd.DataFrame:
+        """Retrieve data source
+
+        Returns:
+            pd.DataFrame: data source
+        """
         return self.__source_data
 
 
@@ -203,6 +208,11 @@ class LanguagesProficienciesPercentages(LanguagesStatsExtractor):
     """
 
     def get_data_source(self) -> DataFrame:
+        """get data source
+
+        Returns:
+            DataFrame: data soruce
+        """
         return self.__lre.get_data_source()
 
     def __init__(self, languages_ranking_extractor: LanguagesRankingExtractor):
